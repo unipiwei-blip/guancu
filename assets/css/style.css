@@ -57,12 +57,12 @@ body::after{
 }
 
 /* 顶部信息条 */
-.topbar{background:linear-gradient(100deg,#0b47d6 0%,#4c5bff 46%,#c0248c 100%);color:#fff;font-size:12.5px;letter-spacing:.02em;position:relative;overflow:hidden}
+.topbar{background:linear-gradient(100deg,#0b47d6 0%,#4c5bff 46%,#c0248c 100%);color:#fff;font-size:clamp(13px,3.9vw,15.5px);letter-spacing:.02em;position:relative;overflow:hidden}
 .topbar::after{content:"";position:absolute;top:-60px;left:38%;width:340px;height:160px;background:radial-gradient(closest-side,rgba(255,255,255,.35),transparent);filter:blur(14px)}
-.topbar .container{display:flex;align-items:center;justify-content:center;gap:16px;min-height:36px;position:relative;z-index:1;flex-wrap:wrap}
+.topbar .container{display:flex;align-items:center;justify-content:center;min-height:40px;position:relative;z-index:1;flex-wrap:nowrap;white-space:nowrap}
+.topbar .container>span{display:block;text-align:center}
 .topbar b{font-weight:800}
 .topbar .spark{display:inline-block;width:6px;height:6px;border-radius:50%;background:#ffd76a;margin-right:8px;box-shadow:0 0 10px #ffd76a;vertical-align:2px}
-.topbar a{text-decoration:underline;text-underline-offset:3px;white-space:nowrap}
 
 /* 导航 */
 .nav{position:sticky;top:0;z-index:60;background:rgba(255,255,255,.80);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-bottom:1px solid rgba(22,94,200,.09);transition:box-shadow .3s}
@@ -375,6 +375,7 @@ body::after{
   .grid-4{grid-template-columns:1fr}
   .hero-stats,.numbers{grid-template-columns:repeat(2,1fr)}
   .topbar .hide-sm{display:none}
+  .topbar .container{padding:0 10px}
   .container{padding:0 18px}
   .h1{font-size:36px}
 }

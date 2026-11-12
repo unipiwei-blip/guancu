@@ -320,6 +320,7 @@ def head_meta(title, desc, keywords, path, og_image, page_type='website', articl
         '<meta name="viewport" content="width=device-width, initial-scale=1">',
         '<meta http-equiv="X-UA-Compatible" content="IE=edge">',
         f'<title>{title}</title>',
+        *(['<meta name="google-site-verification" content="EHeXrOnv56_4JXQoKXmaHYtrQHywk7ax0I5pUc1IjZg">'] if path == 'index.html' else []),
         f'<meta name="description" content="{desc}">',
         f'<meta name="keywords" content="{keywords}">',
         '<meta name="author" content="莞促集团有限公司">',
@@ -392,7 +393,6 @@ def header(base, page):
     links = ''.join(f'<a href="{base}{f}" data-nav="{k}">{n}</a>' for n, f, k in NAV)
     return f'''<div class="topbar"><div class="container">
 <span><i class="spark"></i><b>莞促集团</b>　企业服务 · 数字赋能 · 产业投资<span class="hide-sm">　|　扎根东莞，服务粤港澳大湾区</span></span>
-<a href="{base}about.html">走进莞促集团 &rarr;</a>
 </div></div>
 <header class="nav"><div class="container">
 <a class="brand" href="{base}index.html" aria-label="莞促集团首页">
