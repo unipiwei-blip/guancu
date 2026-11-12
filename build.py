@@ -19,6 +19,7 @@ FRIENDS = [
     ('广东省湖南攸县商会', 'https://www.zyyous.com/'),
     ('才猎天下大数据', 'https://www.91cailie.com/'),
     ('湾区（广东）数字经济研究院', 'https://www.baydea.com/'),
+    ('东莞市常平个体私营企业协会', 'https://www.ichangping.cn/'),
 ]
 
 CITY_SVG = '''<svg class="city" viewBox="0 0 1440 230" preserveAspectRatio="none" aria-hidden="true">
@@ -348,7 +349,7 @@ def jsonld(page_type, title, desc, canonical, path, extra=None, article=None, br
     org = {
         '@type': 'Organization', '@id': SITE + '/#organization',
         'name': '莞促集团有限公司', 'alternateName': '莞促集团', 'url': SITE,
-        'logo': SITE + '/assets/img/logo.svg',
+        'logo': SITE + '/assets/img/logo.png',
         'image': SITE + '/assets/img/biz-hq.jpg',
         'description': '莞促集团立足东莞，业务涵盖企业总部管理、财税与工商服务、知识产权、数字科技、产业投资、教育文旅与新能源。',
         'foundingDate': '2017-10-27',
@@ -395,7 +396,7 @@ def header(base, page):
 </div></div>
 <header class="nav"><div class="container">
 <a class="brand" href="{base}index.html" aria-label="莞促集团首页">
-<img src="{base}assets/img/logo.svg" alt="莞促集团标识"><span class="brand-txt"><strong>莞促集团</strong></span></a>
+<img src="{base}assets/img/logo.png" alt="莞促集团标识"><span class="brand-txt"><strong>莞促集团</strong></span></a>
 <span class="brand-slogan">企业服务 · 数字赋能 · 产业投资</span>
 <nav class="nav-menu" aria-label="主导航">{links}</nav>
 <a class="btn btn-primary nav-cta" href="{base}contact.html">联系洽谈</a>
@@ -416,7 +417,7 @@ def footer(base):
     return f'''<footer class="footer"><div class="container">
 <div class="footer-top">
 <div>
-<a class="brand" href="{base}index.html"><img src="{base}assets/img/logo.svg" alt="莞促集团标识"><span class="brand-txt"><strong>莞促集团</strong></span></a>
+<a class="brand" href="{base}index.html"><img src="{base}assets/img/logo.png" alt="莞促集团标识"><span class="brand-txt"><strong>莞促集团</strong></span></a>
 <p class="footer-about">立足东莞的综合性企业服务与产业投资集团，业务涵盖企业总部管理、财税工商、知识产权、数字科技、产业投资、教育文旅与新能源。</p>
 <div class="pills"><span class="pill">企业服务</span><span class="pill">产业投资</span><span class="pill">数字赋能</span></div>
 </div>
@@ -441,8 +442,9 @@ def page(path, title, desc, keywords, body, page_type='WebPage', og='biz-hq.jpg'
 <html lang="zh-CN">
 <head>
 {meta}
+<link rel="icon" href="{base}assets/img/favicon.ico" sizes="any">
 <link rel="icon" href="{base}assets/img/favicon.png" type="image/png">
-<link rel="apple-touch-icon" href="{base}assets/img/favicon.png">
+<link rel="apple-touch-icon" href="{base}assets/img/apple-touch-icon.png">
 <link rel="stylesheet" href="{base}assets/css/style.css">
 {ld}
 </head>

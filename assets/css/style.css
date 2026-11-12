@@ -69,7 +69,7 @@ body::after{
 .nav.scrolled{box-shadow:0 8px 28px rgba(15,60,150,.10)}
 .nav .container{height:72px;display:flex;align-items:center;gap:20px}
 .brand{display:flex;align-items:center;gap:10px;flex-shrink:0;text-align:left}
-.brand img{width:40px;height:40px;object-fit:contain;margin:0}
+.brand img{width:44px;height:44px;object-fit:contain;margin:0}
 .brand-txt strong{display:block;font-size:20px;font-weight:900;letter-spacing:.06em;line-height:1.15;color:var(--ink);white-space:nowrap}
 .brand-slogan{font-size:12px;color:var(--muted);white-space:nowrap;border-left:1px solid var(--line);padding-left:16px}
 .nav-menu{display:flex;align-items:center;gap:2px;margin-left:auto}
@@ -307,7 +307,7 @@ body::after{
 .footer .container{position:relative;z-index:1}
 .footer-top{display:grid;grid-template-columns:1.15fr 1.25fr 1fr;gap:34px;padding:20px 0 12px;text-align:center}
 .footer .brand{justify-content:center;text-align:center}
-.footer .brand img{width:42px;height:42px;background:#fff;border-radius:12px;padding:3px}
+.footer .brand img{width:44px;height:44px;background:#fff;border-radius:12px;padding:3px}
 .footer .brand-txt strong{color:#fff}
 .footer-about{font-size:12.5px;line-height:1.8;color:#a9c2ec;margin:10px auto 0;max-width:330px}
 .footer .pills{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:10px}
