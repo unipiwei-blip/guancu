@@ -1,0 +1,6 @@
+_tmp_preview/
+__pycache__/
+.workbuddy/
+*.pyc
+.DS_Store
+Thumbs.db
