@@ -1,4 +1,16 @@
+# 莞促集团官网 · 搜索引擎抓取规则
+# 404.html 由服务器返回 404 状态并标记 noindex,follow，不在此禁止抓取
 User-agent: *
 Allow: /
+Allow: /assets/
 
+User-agent: Baiduspider
+Allow: /
+Allow: /assets/
+
+User-agent: Googlebot
+Allow: /
+Allow: /assets/
+
+Host: www.guancu.com
 Sitemap: https://www.guancu.com/sitemap.xml

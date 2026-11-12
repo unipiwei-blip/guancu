@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """莞促集团官网静态站点生成器。运行后产出全部 HTML / SEO / 站点地图文件。"""
-import os, json
+import os, json, datetime
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 SITE = 'https://www.guancu.com'
-TODAY = '2026-11-12'
+TODAY = datetime.date.today().isoformat()
 
 NAV = [
     ('首页', 'index.html', 'index'),
@@ -20,6 +20,8 @@ FRIENDS = [
     ('才猎天下大数据', 'https://www.91cailie.com/'),
     ('湾区（广东）数字经济研究院', 'https://www.baydea.com/'),
     ('东莞市常平个体私营企业协会', 'https://www.ichangping.cn/'),
+    ('AI建站-跨境极站', 'https://www.gosite.com.cn/'),
+    ('莞促集团', 'https://www.guancu.com/'),
 ]
 
 CITY_SVG = '''<svg class="city" viewBox="0 0 1440 230" preserveAspectRatio="none" aria-hidden="true">
@@ -921,15 +923,48 @@ def build_sitemap_page():
 
 # ---------------------------------------------------------------- 404
 def build_404():
-    body = '''<section class="page-hero"><div class="container">
+    """独立生成 404：noindex,follow、无 canonical/OG/结构化数据、无自动跳转，仅普通链接入口。"""
+    base = ''
+    links = ''.join(
+        f'<a class="card" href="{f}"><span class="num">LINK {i+1:02d}</span><h3 class="h3">{n}</h3></a>'
+        for i, (n, f, k) in enumerate(NAV))
+    body = f'''<section class="page-hero"><div class="container">
 <span class="eyebrow">404 / PAGE NOT FOUND</span>
 <h1 class="h2" style="font-size:clamp(30px,3.6vw,48px)">页面暂时无法访问</h1>
-<p class="lead">您访问的页面可能已调整位置，可从首页或网站地图重新出发。</p>
+<p class="lead">您访问的页面不存在或已调整位置，请从首页、网站地图或下方栏目入口继续浏览。</p>
 <div class="article-nav"><a class="btn btn-primary" href="index.html">返回首页</a><a class="btn btn-ghost" href="sitemap.html">查看网站地图</a></div>
+</div></section>
+
+<section class="section tight"><div class="container">
+<div class="sec-head"><span class="eyebrow">QUICK LINKS / 常用入口</span><h2 class="h2">从这些<span class="blue">页面继续</span></h2></div>
+<div class="grid-4">{links}</div>
 </div></section>'''
-    return page('404.html', '页面未找到｜莞促集团',
-                '您访问的页面不存在或已调整，请从莞促集团官网首页或网站地图继续浏览。',
-                '莞促集团,404,页面未找到', body, 'WebPage', 'biz-hq.jpg', '')
+    doc = f'''<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>页面未找到｜莞促集团</title>
+<meta name="description" content="您访问的页面不存在或已调整，请从莞促集团官网首页或网站地图继续浏览。">
+<meta name="robots" content="noindex,follow">
+<link rel="icon" href="{base}assets/img/favicon.ico" sizes="any">
+<link rel="icon" href="{base}assets/img/favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="{base}assets/img/apple-touch-icon.png">
+<link rel="stylesheet" href="{base}assets/css/style.css">
+</head>
+<body data-page="">
+{header(base, '')}
+<main>
+{body}
+</main>
+{footer(base)}
+<script src="{base}assets/js/main.js" defer></script>
+</body>
+</html>
+'''
+    with open(os.path.join(ROOT, '404.html'), 'w', encoding='utf-8') as fh:
+        fh.write(doc)
+    return '404.html'
 
 
 # ---------------------------------------------------------------- SEO 文件
@@ -943,6 +978,8 @@ def build_seo_files(paths):
             pri, freq = '1.0', 'weekly'
         elif p in ('news.html', 'sitemap.html'):
             pri, freq = '0.8', 'weekly'
+        elif p == 'news-2.html':
+            pri, freq = '0.5', 'weekly'
         elif p.startswith('news/'):
             pri, freq = '0.6', 'monthly'
         else:
@@ -956,8 +993,25 @@ def build_seo_files(paths):
     xml = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + '\n'.join(urls) + '\n</urlset>\n'
     with open(os.path.join(ROOT, 'sitemap.xml'), 'w', encoding='utf-8') as f:
         f.write(xml)
+    robots = f'''# 莞促集团官网 · 搜索引擎抓取规则
+# 404.html 由服务器返回 404 状态并标记 noindex,follow，不在此禁止抓取
+User-agent: *
+Allow: /
+Allow: /assets/
+
+User-agent: Baiduspider
+Allow: /
+Allow: /assets/
+
+User-agent: Googlebot
+Allow: /
+Allow: /assets/
+
+Host: www.guancu.com
+Sitemap: {SITE}/sitemap.xml
+'''
     with open(os.path.join(ROOT, 'robots.txt'), 'w', encoding='utf-8') as f:
-        f.write('User-agent: *\nAllow: /\n\nSitemap: ' + SITE + '/sitemap.xml\n')
+        f.write(robots)
     with open(os.path.join(ROOT, 'CNAME'), 'w', encoding='utf-8') as f:
         f.write('www.guancu.com\n')
     with open(os.path.join(ROOT, '.nojekyll'), 'w', encoding='utf-8') as f:
