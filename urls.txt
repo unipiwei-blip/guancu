@@ -30,3 +30,11 @@ https://www.guancu.com/news/changping-visit.html
 https://www.guancu.com/news/seal-business-2006.html
 https://www.guancu.com/news/group-history-2017.html
 https://www.guancu.com/news/ip-service-2008.html
+https://www.guancu.com/category/group-news.html
+https://www.guancu.com/category/group-archive.html
+https://www.guancu.com/category/group-honor.html
+https://www.guancu.com/category/member-companies.html
+https://www.guancu.com/category/industry-investment.html
+https://www.guancu.com/category/industry-insight.html
+https://www.guancu.com/category/exchange.html
+https://www.guancu.com/category/announcements.html

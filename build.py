@@ -275,6 +275,38 @@ def news_filename(idx):
     return 'news.html' if idx == 1 else f'news-{idx}.html'
 
 
+# 文章分类：每个分类对应一个可点击、可被搜索引擎收录的独立页面
+CATEGORIES = [
+    ('集团动态', 'group-news', '集团会议、业务部署与走访交流等动态资讯'),
+    ('集团档案', 'group-archive', '集团发展脉络、工商沿革与人物档案'),
+    ('集团荣誉', 'group-honor', '资质备案、导师聘任与行业认可'),
+    ('成员企业', 'member-companies', '控股企业、成员企业与投资企业的最新动态'),
+    ('产业投资', 'industry-investment', '新能源项目与产业投资合作进展'),
+    ('产业观察', 'industry-insight', '东莞及粤港澳大湾区的产业环境与政策动态'),
+    ('交流合作', 'exchange', '商协会走访、校企合作与交流活动'),
+    ('通知公告', 'announcements', '节假日安排与集团对外通知'),
+]
+CAT_SLUG = {name: slug for name, slug, _ in CATEGORIES}
+
+
+def cat_file(slug):
+    return f'category/{slug}.html'
+
+
+def cat_count(name):
+    return sum(1 for a in ARTICLES if a['cat'] == name)
+
+
+def category_tags(active=None, base=''):
+    """可点击的分类标签；active 为当前分类名，None 表示「全部」页。"""
+    all_cls = 'pill active' if active is None else 'pill'
+    out = [f'<a class="{all_cls}" href="{base}news.html">全部 <i class="cnt">{len(ARTICLES)}</i></a>']
+    for name, slug, _ in CATEGORIES:
+        cls = 'pill active' if active == name else 'pill'
+        out.append(f'<a class="{cls}" href="{base}{cat_file(slug)}">{name} <i class="cnt">{cat_count(name)}</i></a>')
+    return ''.join(out)
+
+
 # ---------------------------------------------------------------- 业务板块
 SERVICES = [
     dict(num='01', ico='企', name='企业总部管理与咨询', desc='集团管控、组织设计与经营顾问', img='biz-hq.jpg',
@@ -493,8 +525,9 @@ def sec_head(eyebrow, h2, lead=''):
     return f'<div class="sec-head reveal"><span class="eyebrow">{eyebrow}</span><h2 class="h2">{h2}</h2>{l}</div>'
 
 
-def page_hero(eyebrow, h1, lead, crumb, base=''):
-    return f'''<section class="page-hero"><div class="container">
+def page_hero(eyebrow, h1, lead, crumb, base='', compact=False):
+    cls = 'page-hero compact' if compact else 'page-hero'
+    return f'''<section class="{cls}"><div class="container">
 <span class="eyebrow">{eyebrow}</span><h1 class="h2" style="font-size:clamp(30px,3.6vw,48px)">{h1}</h1>
 <p class="lead">{lead}</p>
 <div class="breadcrumb"><a href="{base}index.html">首页</a><span>/</span>{crumb}</div>
@@ -811,8 +844,7 @@ def build_news_list(idx):
     nums = ''.join(
         (f'<span class="current">{n}</span>' if n == idx else f'<a href="{news_filename(n)}">{n}</a>')
         for n in range(1, total + 1))
-    cats = ''.join(f'<span class="pill">{c}</span>' for c in
-                   ['集团动态', '集团档案', '集团荣誉', '成员企业', '产业投资', '产业观察', '交流合作', '通知公告'])
+    cats = category_tags()
     itemlist = {'@type': 'ItemList', 'name': '莞促集团新闻资讯',
                 'itemListElement': [{'@type': 'ListItem', 'position': i + 1, 'name': a['title'],
                                      'url': SITE + '/' + a['file']} for i, a in enumerate(arts)]}
@@ -820,10 +852,10 @@ def build_news_list(idx):
              else f'新闻资讯 第{idx}页｜莞促集团动态、产业观察与通知公告')
     desc = (f'莞促集团新闻资讯栏目，发布集团动态、成员企业进展、产业观察、交流合作与通知公告，共{len(ARTICLES)}篇文章，当前第{idx}页。')
     crumb = '新闻资讯' + ('' if idx == 1 else f' · 第 {idx} 页')
-    body = f'''{page_hero('NEWS / 新闻资讯', '集团动态与产业观察', '走访交流、项目进展、区域产业动态与通知公告，记录集团与产业共同前行的脚步。', crumb)}
+    body = f'''{page_hero('NEWS / 新闻资讯', '集团动态与产业观察', '走访交流、项目进展、区域产业动态与通知公告，记录集团与产业共同前行的脚步。', crumb, compact=True)}
 
-<section class="section tight"><div class="container">
-<div class="tag-list reveal" style="margin-bottom:34px">{cats}</div>
+<section class="section tight news-list-section"><div class="container">
+<div class="tag-list" style="margin:0 0 22px">{cats}</div>
 <div class="news-grid">{cards}</div>
 <div class="pager">{prev}{nums}{nxt}</div>
 <p class="note">共 {len(ARTICLES)} 篇资讯 · 每页 {PER_PAGE} 篇 · 当前第 {idx} / {total} 页</p>
@@ -835,31 +867,60 @@ def build_news_list(idx):
                 breadcrumb=[('首页', ''), ('新闻资讯', 'news.html')])
 
 
+# ---------------------------------------------------------------- 文章分类页
+def build_category(name, slug, desc):
+    base = '../'
+    arts = [a for a in ARTICLES if a['cat'] == name]
+    cards = ''.join(news_card(a, base) for a in arts)
+    tags = category_tags(active=name, base=base)
+    itemlist = {'@type': 'ItemList', 'name': f'莞促集团新闻资讯 · {name}',
+                'itemListElement': [{'@type': 'ListItem', 'position': i + 1, 'name': a['title'],
+                                     'url': SITE + '/' + a['file']} for i, a in enumerate(arts)]}
+    crumb = f'<a href="../news.html">新闻资讯</a><span>/</span>{name}'
+    body = f'''{page_hero('NEWS CATEGORY / 文章分类', name, desc, crumb, base=base, compact=True)}
+
+<section class="section tight news-list-section"><div class="container">
+<div class="tag-list" style="margin:0 0 22px">{tags}</div>
+<div class="news-grid">{cards}</div>
+<p class="note">本分类共 {len(arts)} 篇文章 · 全部资讯共 {len(ARTICLES)} 篇</p>
+<div class="article-nav"><a class="btn btn-ghost" href="../news.html">返回全部资讯</a><a class="btn btn-primary" href="../sitemap.html">查看网站地图</a></div>
+</div></section>
+
+{cta_block('与莞促集团同行', '业务咨询、产业合作与资源对接，欢迎随时联络。', base)}'''
+    title = f'{name}｜莞促集团新闻资讯分类'
+    meta_desc = f'莞促集团新闻资讯「{name}」分类，共{len(arts)}篇文章。{desc}。'
+    keywords = f'莞促集团,{name},新闻分类,集团资讯,文章归档'
+    return page(cat_file(slug), title, meta_desc, keywords, body,
+                'CollectionPage', arts[0]['cover'], 'news', extra=itemlist,
+                breadcrumb=[('首页', ''), ('新闻资讯', 'news.html'), (name, cat_file(slug))])
+
+
 # ---------------------------------------------------------------- 新闻详情
 def build_article(a):
     base = '../'
     content = render_body(a['body'], base)
     rel = [x for x in ARTICLES if x['slug'] != a['slug']][:3]
     rel_html = ''.join(f'<a class="chip" href="{x["slug"]}.html">{x["title"][:22]}…</a>' for x in rel)
-    body = f'''<section class="page-hero"><div class="container">
-<span class="eyebrow">NEWS / {a['cat']}</span>
-<div class="breadcrumb"><a href="../index.html">首页</a><span>/</span><a href="../news.html">新闻资讯</a><span>/</span>正文</div>
+    cat_url = f'../{cat_file(CAT_SLUG[a["cat"]])}'
+    body = f'''<section class="page-hero compact"><div class="container">
+<span class="eyebrow">NEWS / <a href="{cat_url}">{a['cat']}</a></span>
+<div class="breadcrumb"><a href="../index.html">首页</a><span>/</span><a href="../news.html">新闻资讯</a><span>/</span><a href="{cat_url}">{a['cat']}</a><span>/</span>正文</div>
 </div></section>
 
-<section class="section tight"><div class="container">
+<section class="section tight news-list-section"><div class="container">
 <div class="article-head"><h1 class="h2">{a['title']}</h1>
-<div class="article-meta"><span>发布日期：{a['date']}</span><span>栏目：{a['cat']}</span><span>莞促集团</span></div></div>
+<div class="article-meta"><span>发布日期：{a['date']}</span><span>栏目：<a href="{cat_url}">{a['cat']}</a></span><span>莞促集团</span></div></div>
 <div class="article-cover"><img src="../assets/img/{a['cover']}" alt="{a['title']}"></div>
 <div class="prose">{content}</div>
-<div class="article-nav"><a class="btn btn-ghost" href="../news.html">返回资讯列表</a><a class="btn btn-primary" href="../contact.html">业务咨询</a></div>
-<div class="tag-list" style="margin-top:30px"><span class="pill">相关资讯</span>{rel_html}</div>
+<div class="article-nav"><a class="btn btn-ghost" href="../news.html">返回资讯列表</a><a class="btn btn-ghost" href="{cat_url}">查看{a['cat']}分类</a><a class="btn btn-primary" href="../contact.html">业务咨询</a></div>
+<div class="tag-list" style="margin:30px 0 0"><span class="pill">相关资讯</span>{rel_html}</div>
 </div></section>
 
 {cta_block('与莞促集团同行', '业务咨询、产业合作与资源对接，欢迎随时联络。', base)}'''
     ld_extra = None
     return page(a['file'], a['title'] + '｜莞促集团新闻资讯', a['desc'], a['keywords'],
                 body, 'WebPage', a['cover'], 'news', extra=ld_extra, article=a,
-                breadcrumb=[('首页', ''), ('新闻资讯', 'news.html'), (a['cat'], 'news.html')])
+                breadcrumb=[('首页', ''), ('新闻资讯', 'news.html'), (a['cat'], cat_file(CAT_SLUG[a['cat']]))])
 
 
 # ---------------------------------------------------------------- 联系我们
@@ -931,7 +992,9 @@ def build_sitemap_page():
     half = (len(ARTICLES) + 1) // 2
     news_a = ''.join(f'<a href="{a["file"]}">{a["title"]}</a>' for a in ARTICLES[:half])
     news_b = ''.join(f'<a href="{a["file"]}">{a["title"]}</a>' for a in ARTICLES[half:])
-    total_pages = 7 + (NEWS_PAGES - 1) + len(ARTICLES)
+    cats = ''.join(f'<a href="{cat_file(slug)}">{name}（{cat_count(name)}）</a>'
+                   for name, slug, _ in CATEGORIES)
+    total_pages = 7 + (NEWS_PAGES - 1) + len(ARTICLES) + len(CATEGORIES)
     body = f'''{page_hero('SITEMAP / 网站地图', '全站内容，一页可达', '按栏目整理的全部页面与文章入口，方便快速定位所需信息。', '网站地图')}
 
 <section class="section tight"><div class="container">
@@ -940,11 +1003,12 @@ def build_sitemap_page():
 <div class="sitemap-box reveal"><h3>业务板块</h3>{svc}</div>
 <div class="sitemap-box reveal"><h3>集团版图</h3>{grp}</div>
 </div>
+<div class="sitemap-box reveal" style="margin-top:20px"><h3>新闻资讯分类</h3><div class="cat-links">{cats}</div></div>
 <div class="grid-2" style="margin-top:20px">
 <div class="sitemap-box reveal"><h3>新闻资讯文章（1—{half}）</h3>{news_a}</div>
 <div class="sitemap-box reveal"><h3>新闻资讯文章（{half+1}—{len(ARTICLES)}）</h3>{news_b}</div>
 </div>
-<p class="note" style="margin-top:22px">全站共 {total_pages} 个内容页面 · 共 {len(ARTICLES)} 篇资讯 · 最近更新 {TODAY}</p>
+<p class="note" style="margin-top:22px">全站共 {total_pages} 个内容页面 · 共 {len(ARTICLES)} 篇资讯 · {len(CATEGORIES)} 个文章分类 · 最近更新 {TODAY}</p>
 </div></section>
 
 {cta_block('需要帮助？', '如果一时没有找到想要的内容，欢迎直接与集团联系。')}'''
@@ -1014,6 +1078,8 @@ def build_seo_files(paths):
             pri, freq = '0.8', 'weekly'
         elif p.startswith('news-'):
             pri, freq = '0.5', 'weekly'
+        elif p.startswith('category/'):
+            pri, freq = '0.7', 'weekly'
         elif p.startswith('news/'):
             pri, freq = '0.6', 'monthly'
         else:
@@ -1054,7 +1120,8 @@ Sitemap: {SITE}/sitemap.xml
     all_urls = [SITE + '/' + p for p in paths if p != '404.html']
     with open(os.path.join(ROOT, 'urls.txt'), 'w', encoding='utf-8') as f:
         f.write('\n'.join(all_urls) + '\n')
-    news_urls = [SITE + '/' + a['file'] for a in ARTICLES]
+    news_urls = ([SITE + '/' + a['file'] for a in ARTICLES]
+                 + [SITE + '/' + cat_file(slug) for _, slug, _ in CATEGORIES])
     with open(os.path.join(ROOT, 'news-urls.txt'), 'w', encoding='utf-8') as f:
         f.write('\n'.join(news_urls) + '\n')
     return len(urls)
@@ -1072,10 +1139,12 @@ def main():
     paths.append(build_sitemap_page())
     for a in ARTICLES:
         paths.append(build_article(a))
+    for name, slug, desc in CATEGORIES:
+        paths.append(build_category(name, slug, desc))
     paths.append(build_404())
     n = build_seo_files(paths)
     print('生成页面：', len(paths), '个 HTML；sitemap.xml 收录：', n, '个 URL')
-    print('新闻文章：', len(ARTICLES), '篇；列表分页：', NEWS_PAGES, '页')
+    print('新闻文章：', len(ARTICLES), '篇；列表分页：', NEWS_PAGES, '页；文章分类：', len(CATEGORIES), '个')
     for p in paths:
         print('  ', p)
 
