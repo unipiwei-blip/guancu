@@ -253,7 +253,27 @@ ARTICLES = [
     ),
 ]
 
+# 2026-11-13 全网资料整理新增的资讯稿，独立维护在 news_data.py
+from news_data import NEW_ARTICLES
+
+# 补齐用于结构化数据与排序的 ISO 日期（旧稿中有中文月份写法）
+_ISO_FIX = {'2026年9月': '2026-09', '2021年2月': '2021-02'}
+for _a in ARTICLES:
+    _a.setdefault('iso_date', _ISO_FIX.get(_a['date'], _a['date']))
+for _a in NEW_ARTICLES:
+    _a.setdefault('iso_date', _a.get('iso_date', _a['date']))
+ARTICLES = NEW_ARTICLES + ARTICLES
+ARTICLES.sort(key=lambda a: a['iso_date'], reverse=True)
+
 ART_BY_SLUG = {a['slug']: a for a in ARTICLES}
+
+PER_PAGE = 6
+NEWS_PAGES = (len(ARTICLES) + PER_PAGE - 1) // PER_PAGE
+
+
+def news_filename(idx):
+    return 'news.html' if idx == 1 else f'news-{idx}.html'
+
 
 # ---------------------------------------------------------------- 业务板块
 SERVICES = [
@@ -342,7 +362,7 @@ def head_meta(title, desc, keywords, path, og_image, page_type='website', articl
     ]
     if article:
         tags += [
-            f'<meta property="article:published_time" content="{article["date"]}">',
+            f'<meta property="article:published_time" content="{article.get("iso_date", article["date"])}">',
             '<meta property="article:author" content="莞促集团">',
         ]
     return '\n'.join(tags), canonical, ogi
@@ -371,7 +391,8 @@ def jsonld(page_type, title, desc, canonical, path, extra=None, article=None, br
     if article:
         node = {'@type': 'NewsArticle', '@id': canonical + '#article', 'headline': title,
                 'description': desc, 'image': SITE + '/assets/img/' + article['cover'],
-                'datePublished': article['date'], 'dateModified': TODAY,
+                'datePublished': article.get('iso_date', article['date']), 'dateModified': TODAY,
+                'keywords': article.get('keywords', ''),
                 'author': {'@id': SITE + '/#organization'},
                 'publisher': {'@id': SITE + '/#organization'},
                 'mainEntityOfPage': {'@id': canonical + '#webpage'},
@@ -778,33 +799,39 @@ def build_companies():
 
 # ---------------------------------------------------------------- 新闻列表
 def build_news_list(idx):
-    start = 0 if idx == 1 else 6
-    arts = ARTICLES[start:start + 6]
-    f = 'news.html' if idx == 1 else f'news-{idx}.html'
+    total = NEWS_PAGES
+    start = (idx - 1) * PER_PAGE
+    arts = ARTICLES[start:start + PER_PAGE]
+    f = news_filename(idx)
     cards = ''.join(news_card(a) for a in arts)
-    prev = '<span class="disabled">上一页</span>' if idx == 1 else '<a href="news.html">上一页</a>'
-    nxt = '<a href="news-2.html">下一页</a>' if idx == 1 else '<span class="disabled">下一页</span>'
-    p1 = '<span class="current">1</span>' if idx == 1 else '<a href="news.html">1</a>'
-    p2 = '<a href="news-2.html">2</a>' if idx == 1 else '<span class="current">2</span>'
-    cats = ''.join(f'<span class="pill">{c}</span>' for c in ['集团动态', '产业投资', '产业观察', '交流合作', '集团荣誉', '通知公告'])
+    prev = ('<span class="disabled">上一页</span>' if idx == 1
+            else f'<a href="{news_filename(idx - 1)}">上一页</a>')
+    nxt = ('<a href="' + news_filename(idx + 1) + '">下一页</a>' if idx < total
+           else '<span class="disabled">下一页</span>')
+    nums = ''.join(
+        (f'<span class="current">{n}</span>' if n == idx else f'<a href="{news_filename(n)}">{n}</a>')
+        for n in range(1, total + 1))
+    cats = ''.join(f'<span class="pill">{c}</span>' for c in
+                   ['集团动态', '集团档案', '集团荣誉', '成员企业', '产业投资', '产业观察', '交流合作', '通知公告'])
     itemlist = {'@type': 'ItemList', 'name': '莞促集团新闻资讯',
                 'itemListElement': [{'@type': 'ListItem', 'position': i + 1, 'name': a['title'],
-                                     'url': SITE + '/' + a['file']} for i, a in enumerate(ARTICLES)]}
-    title = '新闻资讯｜莞促集团动态、产业观察与通知公告' if idx == 1 else '新闻资讯 第2页｜莞促集团动态、产业观察与通知公告'
-    desc = ('莞促集团新闻资讯栏目，发布集团动态、产业投资进展、行业观察、交流合作与通知公告，共9篇重点文章。'
-            if idx == 1 else '莞促集团新闻资讯第2页，收录集团荣誉、交流合作与通知公告等重点文章。')
-    body = f'''{page_hero('NEWS / 新闻资讯', '集团动态与产业观察', '走访交流、项目进展、区域产业动态与通知公告，记录集团与产业共同前行的脚步。', '新闻资讯' + ('' if idx == 1 else ' · 第 2 页'))}
+                                     'url': SITE + '/' + a['file']} for i, a in enumerate(arts)]}
+    title = ('新闻资讯｜莞促集团动态、产业观察与通知公告' if idx == 1
+             else f'新闻资讯 第{idx}页｜莞促集团动态、产业观察与通知公告')
+    desc = (f'莞促集团新闻资讯栏目，发布集团动态、成员企业进展、产业观察、交流合作与通知公告，共{len(ARTICLES)}篇文章，当前第{idx}页。')
+    crumb = '新闻资讯' + ('' if idx == 1 else f' · 第 {idx} 页')
+    body = f'''{page_hero('NEWS / 新闻资讯', '集团动态与产业观察', '走访交流、项目进展、区域产业动态与通知公告，记录集团与产业共同前行的脚步。', crumb)}
 
 <section class="section tight"><div class="container">
 <div class="tag-list reveal" style="margin-bottom:34px">{cats}</div>
 <div class="news-grid">{cards}</div>
-<div class="pager">{prev}{p1}{p2}{nxt}</div>
-<p class="note">共 9 篇资讯 · 每页 6 篇 · 当前第 {idx} / 2 页</p>
+<div class="pager">{prev}{nums}{nxt}</div>
+<p class="note">共 {len(ARTICLES)} 篇资讯 · 每页 {PER_PAGE} 篇 · 当前第 {idx} / {total} 页</p>
 </div></section>
 
 {cta_block('保持联络', '希望进一步了解集团动态或业务进展，欢迎与我们联系。')}'''
     return page(f, title, desc, '莞促集团新闻,集团动态,产业观察,通知公告,项目进展,走访交流',
-                body, 'CollectionPage', ARTICLES[start]['cover'], 'news', extra=itemlist,
+                body, 'CollectionPage', arts[0]['cover'], 'news', extra=itemlist,
                 breadcrumb=[('首页', ''), ('新闻资讯', 'news.html')])
 
 
@@ -898,19 +925,26 @@ def build_contact():
 # ---------------------------------------------------------------- 网站地图
 def build_sitemap_page():
     main = ''.join(f'<a href="{f}">{n}</a>' for n, f, k in NAV if k != 'index')
+    pages = ''.join(f'<a href="{news_filename(i)}">新闻资讯 第 {i} 页</a>' for i in range(2, NEWS_PAGES + 1))
     svc = ''.join(f'<a href="services.html#s{int(s["num"])}">{s["name"]}</a>' for s in SERVICES)
     grp = ''.join(f'<a href="companies.html#g{i+1}">{g[1]}</a>' for i, g in enumerate(COMPANY_GROUPS))
-    news = ''.join(f'<a href="{a["file"]}">{a["title"]}</a>' for a in ARTICLES)
+    half = (len(ARTICLES) + 1) // 2
+    news_a = ''.join(f'<a href="{a["file"]}">{a["title"]}</a>' for a in ARTICLES[:half])
+    news_b = ''.join(f'<a href="{a["file"]}">{a["title"]}</a>' for a in ARTICLES[half:])
+    total_pages = 7 + (NEWS_PAGES - 1) + len(ARTICLES)
     body = f'''{page_hero('SITEMAP / 网站地图', '全站内容，一页可达', '按栏目整理的全部页面与文章入口，方便快速定位所需信息。', '网站地图')}
 
 <section class="section tight"><div class="container">
 <div class="sitemap-grid">
-<div class="sitemap-box reveal"><h3>主导航栏目</h3><a href="index.html">首页</a>{main}</div>
+<div class="sitemap-box reveal"><h3>主导航栏目</h3><a href="index.html">首页</a>{main}{pages}</div>
 <div class="sitemap-box reveal"><h3>业务板块</h3>{svc}</div>
 <div class="sitemap-box reveal"><h3>集团版图</h3>{grp}</div>
 </div>
-<div class="sitemap-box reveal" style="margin-top:20px"><h3>新闻资讯文章（9 篇）</h3>{news}</div>
-<p class="note" style="margin-top:22px">全站共 {7 + 1 + len(ARTICLES)} 个内容页面 · 最近更新 {TODAY}</p>
+<div class="grid-2" style="margin-top:20px">
+<div class="sitemap-box reveal"><h3>新闻资讯文章（1—{half}）</h3>{news_a}</div>
+<div class="sitemap-box reveal"><h3>新闻资讯文章（{half+1}—{len(ARTICLES)}）</h3>{news_b}</div>
+</div>
+<p class="note" style="margin-top:22px">全站共 {total_pages} 个内容页面 · 共 {len(ARTICLES)} 篇资讯 · 最近更新 {TODAY}</p>
 </div></section>
 
 {cta_block('需要帮助？', '如果一时没有找到想要的内容，欢迎直接与集团联系。')}'''
@@ -978,7 +1012,7 @@ def build_seo_files(paths):
             pri, freq = '1.0', 'weekly'
         elif p in ('news.html', 'sitemap.html'):
             pri, freq = '0.8', 'weekly'
-        elif p == 'news-2.html':
+        elif p.startswith('news-'):
             pri, freq = '0.5', 'weekly'
         elif p.startswith('news/'):
             pri, freq = '0.6', 'monthly'
@@ -1016,6 +1050,13 @@ Sitemap: {SITE}/sitemap.xml
         f.write('www.guancu.com\n')
     with open(os.path.join(ROOT, '.nojekyll'), 'w', encoding='utf-8') as f:
         f.write('')
+    # 便于提交到百度资源搜索平台 / Google Search Console 的 URL 清单
+    all_urls = [SITE + '/' + p for p in paths if p != '404.html']
+    with open(os.path.join(ROOT, 'urls.txt'), 'w', encoding='utf-8') as f:
+        f.write('\n'.join(all_urls) + '\n')
+    news_urls = [SITE + '/' + a['file'] for a in ARTICLES]
+    with open(os.path.join(ROOT, 'news-urls.txt'), 'w', encoding='utf-8') as f:
+        f.write('\n'.join(news_urls) + '\n')
     return len(urls)
 
 
@@ -1025,8 +1066,8 @@ def main():
     paths.append(build_about())
     paths.append(build_services())
     paths.append(build_companies())
-    paths.append(build_news_list(1))
-    paths.append(build_news_list(2))
+    for i in range(1, NEWS_PAGES + 1):
+        paths.append(build_news_list(i))
     paths.append(build_contact())
     paths.append(build_sitemap_page())
     for a in ARTICLES:
@@ -1034,6 +1075,7 @@ def main():
     paths.append(build_404())
     n = build_seo_files(paths)
     print('生成页面：', len(paths), '个 HTML；sitemap.xml 收录：', n, '个 URL')
+    print('新闻文章：', len(ARTICLES), '篇；列表分页：', NEWS_PAGES, '页')
     for p in paths:
         print('  ', p)
 
