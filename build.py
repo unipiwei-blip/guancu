@@ -39,33 +39,10 @@ def prepare_assets():
     return ver
 
 
-def share_name(cover):
-    """由封面文件名派生方形分享图文件名。"""
-    return 'share-' + (cover[len('cover-'):] if cover.startswith('cover-') else cover)
-
-
-def prepare_share_images():
-    """为每篇文章从封面中心裁切 400x400 方形分享图，作为微信分享缩略图兜底。
-
-    原封面不动；方形图单独存放，供 og:image / itemprop:image 与页面首图引用。
-    图片来自站点已有封面（真实素材或通用示意图）的中心裁切，不生成任何新画面。
-    """
-    from PIL import Image
-    img_dir = os.path.join(ROOT, 'assets', 'img')
-    made = []
-    for a in ARTICLES:
-        src = os.path.join(img_dir, a['cover'])
-        rel = 'assets/img/' + share_name(a['cover'])
-        with Image.open(src) as im:
-            im = im.convert('RGB')
-            w, h = im.size
-            side = min(w, h)
-            x, y = (w - side) // 2, (h - side) // 2
-            im = im.crop((x, y, x + side, y + side)).resize((400, 400), Image.LANCZOS)
-            im.save(os.path.join(ROOT, rel), 'JPEG',
-                    quality=85, optimize=True, progressive=True)
-        made.append(rel)
-    return made
+# 全站统一分享图：400x400 品牌方图（由官方 LOGO 加工，非 AI 生成、无水印）。
+# 所有页面的 og:image / twitter:image / itemprop:image 与 body 首图均指向这一张，
+# 不再为每篇文章单独裁切，保证微信分享卡片风格一致、便于维护。
+SHARE_IMAGE = 'share-brand.jpg'
 
 NAV = [
     ('首页', 'index.html', 'index'),
@@ -427,9 +404,12 @@ COMPANY_GROUPS = [
 
 
 # ---------------------------------------------------------------- 组件
-def head_meta(title, desc, keywords, path, og_image, page_type='website', article=None):
+def head_meta(title, desc, keywords, path, og_image=None, page_type='website', article=None):
+    """og_image 参数保留以兼容现有调用；分享缩略图统一由 SHARE_IMAGE 指定。"""
     canonical = SITE + '/' + path if path else SITE + '/'
-    ogi = SITE + '/assets/img/' + og_image
+    ogi = SITE + '/assets/img/' + SHARE_IMAGE
+    share_title = article['title'] if article else title
+    share_desc = desc[:60].rstrip('，,。；;、：: ')
     tags = [
         '<meta charset="UTF-8">',
         '<meta name="viewport" content="width=device-width, initial-scale=1">',
@@ -449,22 +429,22 @@ def head_meta(title, desc, keywords, path, og_image, page_type='website', articl
         f'<meta property="og:description" content="{desc}">',
         f'<meta property="og:url" content="{canonical}">',
         f'<meta property="og:image" content="{ogi}">',
+        '<meta property="og:image:width" content="400">',
+        '<meta property="og:image:height" content="400">',
         '<meta name="twitter:card" content="summary_large_image">',
         f'<meta name="twitter:title" content="{title}">',
         f'<meta name="twitter:description" content="{desc}">',
         f'<meta name="twitter:image" content="{ogi}">',
+        # 微信内置浏览器对未接 JS-SDK 的页面会尝试读取 og / itemprop。
+        # 全站统一方形品牌图 + 精简文案，保证分享卡片风格一致。
+        f'<meta itemprop="name" content="{share_title}">',
+        f'<meta itemprop="description" content="{share_desc}">',
+        f'<meta itemprop="image" content="{ogi}">',
     ]
     if article:
         tags += [
             f'<meta property="article:published_time" content="{article.get("iso_date", article["date"])}">',
             '<meta property="article:author" content="莞促集团">',
-            # 微信内置浏览器对未接 JS-SDK 的页面会尝试读取 og / itemprop，
-            # 方形图与精简文案能明显提升分享卡片出现标题、摘要与缩略图的概率。
-            f'<meta itemprop="name" content="{article["title"]}">',
-            f'<meta itemprop="description" content="{desc[:60].rstrip("，,。；;、：: ")}">',
-            f'<meta itemprop="image" content="{ogi}">',
-            '<meta property="og:image:width" content="400">',
-            '<meta property="og:image:height" content="400">',
         ]
     return '\n'.join(tags), canonical, ogi
 
@@ -562,15 +542,15 @@ def footer(base):
 
 
 def page(path, title, desc, keywords, body, page_type='WebPage', og='biz-hq.jpg',
-         navkey='', extra=None, article=None, breadcrumb=None, share_img=None):
+         navkey='', extra=None, article=None, breadcrumb=None):
     base = '../' if '/' in path else ''
     meta, canonical, ogi = head_meta(title, desc, keywords, path, og, article=article)
     ld = jsonld(page_type, title, desc, canonical, path, extra=extra, article=article, breadcrumb=breadcrumb)
     css_href, js_href = ASSETS['css'], ASSETS['js']
-    # 微信抓取分享缩略图时会扫描页面图片，把方形分享图放在所有图片之前，
+    # 微信抓取分享缩略图时会扫描页面图片，把全站统一的方形品牌图放在所有图片之前，
     # 移出视口但保留真实渲染与原始尺寸，不影响页面视觉。
-    share_thumb = (f'<img class="wx-share-thumb" src="{base}assets/img/{share_img}" alt="" '
-                   'width="300" height="300" aria-hidden="true">') if share_img else ''
+    share_thumb = (f'<img class="wx-share-thumb" src="{base}assets/img/{SHARE_IMAGE}" alt="" '
+                   'width="300" height="300" aria-hidden="true">')
     doc = f'''<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -997,10 +977,8 @@ def build_article(a):
 
 {cta_block('与莞促集团同行', '业务咨询、产业合作与资源对接，欢迎随时联络。', base)}'''
     ld_extra = None
-    sname = share_name(a['cover'])
     return page(a['file'], a['title'] + '｜莞促集团新闻资讯', a['desc'], a['keywords'],
-                body, 'WebPage', sname, 'news', extra=ld_extra, article=a,
-                share_img=sname,
+                body, 'WebPage', a['cover'], 'news', extra=ld_extra, article=a,
                 breadcrumb=[('首页', ''), ('新闻资讯', 'news.html'), (a['cat'], cat_file(CAT_SLUG[a['cat']]))])
 
 
@@ -1213,7 +1191,6 @@ Sitemap: {SITE}/sitemap.xml
 
 def main():
     ver = prepare_assets()
-    n_share = len(prepare_share_images())
     paths = []
     paths.append(build_index())
     paths.append(build_about())
@@ -1230,7 +1207,7 @@ def main():
     paths.append(build_404())
     n = build_seo_files(paths)
     print('静态资源指纹：', ver, '→', ASSETS['css'], '/', ASSETS['js'])
-    print('方形分享图：', n_share, '张（400x400）')
+    print('全站统一分享图：', SHARE_IMAGE, '（400x400）')
     print('生成页面：', len(paths), '个 HTML；sitemap.xml 收录：', n, '个 URL')
     print('新闻文章：', len(ARTICLES), '篇；列表分页：', NEWS_PAGES, '页；文章分类：', len(CATEGORIES), '个')
     for p in paths:
