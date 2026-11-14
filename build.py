@@ -408,12 +408,16 @@ def jsonld(page_type, title, desc, canonical, path, extra=None, article=None, br
         'image': SITE + '/assets/img/biz-hq.jpg',
         'description': '莞促集团立足东莞，业务涵盖企业总部管理、财税与工商服务、知识产权、数字科技、产业投资、教育文旅与新能源。',
         'foundingDate': '2017-10-27',
-        'telephone': '+86-769-88763333', 'email': '18926805827@139.com',
+        'telephone': ['+86-769-85034888', '400-800-4388'], 'email': 'v@guancu.com',
         'address': {'@type': 'PostalAddress', 'streetAddress': '厚街镇将军路2号悦山花园77号楼102室',
                     'addressLocality': '东莞市', 'addressRegion': '广东省', 'addressCountry': 'CN'},
-        'contactPoint': {'@type': 'ContactPoint', 'telephone': '+86-769-88763333',
-                         'email': '18926805827@139.com', 'contactType': 'customer service',
-                         'availableLanguage': ['zh-CN'], 'areaServed': 'CN'},
+        'contactPoint': [
+            {'@type': 'ContactPoint', 'telephone': '+86-769-85034888',
+             'email': 'v@guancu.com', 'contactType': 'customer service',
+             'availableLanguage': ['zh-CN'], 'areaServed': 'CN'},
+            {'@type': 'ContactPoint', 'telephone': '400-800-4388',
+             'contactType': 'customer service', 'availableLanguage': ['zh-CN'], 'areaServed': 'CN'},
+        ],
     }
     website = {'@type': 'WebSite', '@id': SITE + '/#website', 'url': SITE, 'name': '莞促集团',
                'publisher': {'@id': SITE + '/#organization'}, 'inLanguage': 'zh-CN'}
@@ -479,7 +483,7 @@ def footer(base):
 <div><h4>网站导航</h4><div class="f2col"><ul>{col(nav1)}</ul><ul>{col(nav2)}</ul></div></div>
 <div><h4>联系方式</h4>
 <img class="footer-qr" src="{base}assets/img/qrcode.png" alt="莞促集团官网二维码">
-<p class="footer-contact"><b>0769-88763333</b><br>业务咨询 18926805827<br>邮箱 18926805827@139.com</p>
+<p class="footer-contact"><b>0769-85034888</b><br>咨询热线 400-800-4388<br>邮箱 v@guancu.com</p>
 </div>
 </div>
 <div class="footer-links"><span class="fl-label">友情链接</span>{friends}<span class="fl-sep">·</span><a href="{base}sitemap.html">网站地图</a></div>
@@ -925,8 +929,8 @@ def build_article(a):
 
 # ---------------------------------------------------------------- 联系我们
 def build_contact():
-    items = [('电话', '0769-88763333', '集团联系电话'), ('业务咨询', '18926805827', '业务对接与咨询'),
-             ('邮箱', '18926805827@139.com', '集团联系邮箱'), ('官网', 'www.guancu.com', '集团官方网站'),
+    items = [('电话', '0769-85034888', '集团联系电话'), ('咨询热线', '400-800-4388', '业务对接与咨询'),
+             ('邮箱', 'v@guancu.com', '集团联系邮箱'), ('官网', 'www.guancu.com', '集团官方网站'),
              ('地址', '广东省东莞市厚街镇将军路2号悦山花园77号楼102室', '集团注册地址'),
              ('服务时间', '工作日 09:00–18:00', '咨询接待时间')]
     grid = ''.join(f'''<div class="contact-item reveal"><div class="ci">{i+1:02d}</div><h3>{t}</h3><p>{v}</p>
@@ -977,7 +981,7 @@ def build_contact():
 <div class="faq">{fhtml}</div>
 </div></section>'''
     return page('contact.html', '联系我们｜莞促集团电话、邮箱、地址与业务咨询',
-                '联系莞促集团：电话0769-88763333，业务咨询18926805827，邮箱18926805827@139.com，地址广东省东莞市厚街镇将军路2号悦山花园77号楼102室。',
+                '联系莞促集团：电话0769-85034888，咨询热线400-800-4388，邮箱v@guancu.com，地址广东省东莞市厚街镇将军路2号悦山花园77号楼102室。',
                 '莞促集团联系方式,莞促集团电话,莞促集团地址,业务咨询,东莞企业服务',
                 body, 'ContactPage', 'biz-service.jpg', 'contact',
                 breadcrumb=[('首页', ''), ('联系我们', 'contact.html')])

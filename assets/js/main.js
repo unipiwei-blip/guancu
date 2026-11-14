@@ -76,7 +76,7 @@
         '需求说明：',
         d.get('message') || ''
       ].join('\n');
-      window.location.href = 'mailto:18926805827@139.com?subject=' +
+      window.location.href = 'mailto:v@guancu.com?subject=' +
         encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
       var tip = document.getElementById('form-tip');
       if (tip) tip.textContent = '已为您打开邮件客户端，发送后即有专人跟进。';
