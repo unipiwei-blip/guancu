@@ -1,4 +1,5 @@
 _tmp_preview/
+_deploy_edgeone/
 __pycache__/
 .workbuddy/
 *.pyc
