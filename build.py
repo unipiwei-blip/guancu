@@ -24,35 +24,6 @@ FRIENDS = [
     ('莞促集团', 'https://www.guancu.com/'),
 ]
 
-# 扣子（Coze）网页客服：嵌入到每个页面 body 末尾
-# 真实 PAT 只需改 COZE_TOKEN 一行；占位符状态下脚本不初始化，避免线上出现失效的客服气泡
-COZE_TOKEN = 'pat_********'
-COZE_BOT_ID = '7707984706624684059'
-COZE_TITLE = '莞促集团在线客服'
-EMBED_CODE = '''<!-- 扣子网页客服 -->
-<script src="https://lf-cdn.coze.cn/obj/unpkg/flow-platform/chat-app-sdk/1.2.0-beta.19/libs/cn/index.js"></script>
-<script>
-(function () {
-  var COZE_TOKEN = '__COZE_TOKEN__';
-  if (!COZE_TOKEN || COZE_TOKEN.indexOf('********') !== -1) { return; }
-  new CozeWebSDK.WebChatClient({
-    config: {
-      bot_id: '__COZE_BOT_ID__',
-    },
-    componentProps: {
-      title: '__COZE_TITLE__',
-    },
-    auth: {
-      type: 'token',
-      token: COZE_TOKEN,
-      onRefreshToken: function () {
-        return COZE_TOKEN
-      }
-    }
-  });
-})();
-</script>'''.replace('__COZE_TOKEN__', COZE_TOKEN).replace('__COZE_BOT_ID__', COZE_BOT_ID).replace('__COZE_TITLE__', COZE_TITLE)
-
 CITY_SVG = '''<svg class="city" viewBox="0 0 1440 230" preserveAspectRatio="none" aria-hidden="true">
 <defs><linearGradient id="bld" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="rgba(96,164,255,.34)"/><stop offset="1" stop-color="rgba(255,255,255,.02)"/></linearGradient></defs>
 <g fill="url(#bld)">
@@ -543,7 +514,6 @@ def page(path, title, desc, keywords, body, page_type='WebPage', og='biz-hq.jpg'
 </main>
 {footer(base)}
 <script src="{base}assets/js/main.js" defer></script>
-{EMBED_CODE}
 </body>
 </html>
 '''
@@ -1091,7 +1061,6 @@ def build_404():
 </main>
 {footer(base)}
 <script src="{base}assets/js/main.js" defer></script>
-{EMBED_CODE}
 </body>
 </html>
 '''
