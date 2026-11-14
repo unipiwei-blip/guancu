@@ -39,10 +39,28 @@ def prepare_assets():
     return ver
 
 
-# 全站统一分享图：400x400 品牌方图（由官方 LOGO 加工，非 AI 生成、无水印）。
-# 所有页面的 og:image / twitter:image / itemprop:image 与 body 首图均指向这一张，
-# 不再为每篇文章单独裁切，保证微信分享卡片风格一致、便于维护。
-SHARE_IMAGE = 'share-brand.jpg'
+# 全站统一分享图：400x400 纯官方 LOGO（白底、无文字、无装饰，非 AI 生成、无水印）。
+# 所有页面的 og:image / twitter:image / itemprop:image 与 body 首图均指向这一张。
+# main() 按内容生成带指纹的副本并更新 SHARE_IMAGE，换图后 URL 随之变化，
+# 避免 CDN 与微信继续命中旧图的缓存。
+SHARE_IMAGE_SRC = 'share-brand.jpg'
+SHARE_IMAGE = SHARE_IMAGE_SRC
+
+
+def prepare_share_image():
+    """为统一分享图生成内容指纹副本，并清理历史版本。"""
+    src = os.path.join(ROOT, 'assets', 'img', SHARE_IMAGE_SRC)
+    with open(src, 'rb') as fh:
+        data = fh.read()
+    ver = hashlib.md5(data).hexdigest()[:10]
+    rel = 'assets/img/share-brand.{}.jpg'.format(ver)
+    dst = os.path.join(ROOT, rel)
+    for old in glob.glob(os.path.join(ROOT, 'assets', 'img', 'share-brand.*.jpg')):
+        if os.path.normpath(old) != os.path.normpath(dst):
+            os.remove(old)
+    with open(dst, 'wb') as fh:
+        fh.write(data)
+    return os.path.basename(rel)
 
 NAV = [
     ('首页', 'index.html', 'index'),
@@ -1190,7 +1208,9 @@ Sitemap: {SITE}/sitemap.xml
 
 
 def main():
+    global SHARE_IMAGE
     ver = prepare_assets()
+    SHARE_IMAGE = prepare_share_image()
     paths = []
     paths.append(build_index())
     paths.append(build_about())
@@ -1207,7 +1227,7 @@ def main():
     paths.append(build_404())
     n = build_seo_files(paths)
     print('静态资源指纹：', ver, '→', ASSETS['css'], '/', ASSETS['js'])
-    print('全站统一分享图：', SHARE_IMAGE, '（400x400）')
+    print('全站统一分享图：', SHARE_IMAGE, '（400x400，内容指纹）')
     print('生成页面：', len(paths), '个 HTML；sitemap.xml 收录：', n, '个 URL')
     print('新闻文章：', len(ARTICLES), '篇；列表分页：', NEWS_PAGES, '页；文章分类：', len(CATEGORIES), '个')
     for p in paths:
