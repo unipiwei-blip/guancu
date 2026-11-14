@@ -192,10 +192,28 @@
 <div class="footer-bottom"><span>&copy; <span data-year>2026</span> 莞促集团有限公司 版权所有</span><a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener">粤ICP备17159526号-1</a><span>官网 www.guancu.com</span><span>服务时间 工作日 09:00–18:00</span></div>
 </div></footer>
 <script src="../assets/js/main.js" defer></script>
-<!-- 百度智能体网页客服 -->
-<script src="https://agi-dev-platform-web.cdn.bcebos.com/ai_apaas/embed/output/embedLiteSDK.js?responseExpires=0&t=1794651707993"></script>
+<!-- 扣子网页客服 -->
+<script src="https://lf-cdn.coze.cn/obj/unpkg/flow-platform/chat-app-sdk/1.2.0-beta.19/libs/cn/index.js"></script>
 <script>
-new EmbedLiteSDK({appId: 'f9b19bf7-e9f0-43ea-b76f-26f8cb3af33d', code: 'embed2S9JsbAXruurWVZsWjYz'});
+(function () {
+  var COZE_TOKEN = 'pat_********';
+  if (!COZE_TOKEN || COZE_TOKEN.indexOf('********') !== -1) { return; }
+  new CozeWebSDK.WebChatClient({
+    config: {
+      bot_id: '7707984706624684059',
+    },
+    componentProps: {
+      title: '莞促集团在线客服',
+    },
+    auth: {
+      type: 'token',
+      token: COZE_TOKEN,
+      onRefreshToken: function () {
+        return COZE_TOKEN
+      }
+    }
+  });
+})();
 </script>
 </body>
 </html>

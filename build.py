@@ -24,12 +24,34 @@ FRIENDS = [
     ('莞促集团', 'https://www.guancu.com/'),
 ]
 
-# 百度智能体网页客服：原样嵌入到每个页面 body 末尾（普通字符串，避免 f-string 解析花括号）
-EMBED_CODE = '''<!-- 百度智能体网页客服 -->
-<script src="https://agi-dev-platform-web.cdn.bcebos.com/ai_apaas/embed/output/embedLiteSDK.js?responseExpires=0&t=1794651707993"></script>
+# 扣子（Coze）网页客服：嵌入到每个页面 body 末尾
+# 真实 PAT 只需改 COZE_TOKEN 一行；占位符状态下脚本不初始化，避免线上出现失效的客服气泡
+COZE_TOKEN = 'pat_********'
+COZE_BOT_ID = '7707984706624684059'
+COZE_TITLE = '莞促集团在线客服'
+EMBED_CODE = '''<!-- 扣子网页客服 -->
+<script src="https://lf-cdn.coze.cn/obj/unpkg/flow-platform/chat-app-sdk/1.2.0-beta.19/libs/cn/index.js"></script>
 <script>
-new EmbedLiteSDK({appId: 'f9b19bf7-e9f0-43ea-b76f-26f8cb3af33d', code: 'embed2S9JsbAXruurWVZsWjYz'});
-</script>'''
+(function () {
+  var COZE_TOKEN = '__COZE_TOKEN__';
+  if (!COZE_TOKEN || COZE_TOKEN.indexOf('********') !== -1) { return; }
+  new CozeWebSDK.WebChatClient({
+    config: {
+      bot_id: '__COZE_BOT_ID__',
+    },
+    componentProps: {
+      title: '__COZE_TITLE__',
+    },
+    auth: {
+      type: 'token',
+      token: COZE_TOKEN,
+      onRefreshToken: function () {
+        return COZE_TOKEN
+      }
+    }
+  });
+})();
+</script>'''.replace('__COZE_TOKEN__', COZE_TOKEN).replace('__COZE_BOT_ID__', COZE_BOT_ID).replace('__COZE_TITLE__', COZE_TITLE)
 
 CITY_SVG = '''<svg class="city" viewBox="0 0 1440 230" preserveAspectRatio="none" aria-hidden="true">
 <defs><linearGradient id="bld" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="rgba(96,164,255,.34)"/><stop offset="1" stop-color="rgba(255,255,255,.02)"/></linearGradient></defs>
