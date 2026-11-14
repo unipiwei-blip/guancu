@@ -484,7 +484,7 @@ def footer(base):
 </div>
 <div class="footer-links"><span class="fl-label">友情链接</span>{friends}<span class="fl-sep">·</span><a href="{base}sitemap.html">网站地图</a></div>
 <div class="footer-address">集团地址：广东省东莞市厚街镇将军路2号悦山花园77号楼102室</div>
-<div class="footer-bottom"><span>&copy; <span data-year>2026</span> 莞促集团有限公司 版权所有</span><span>官网 www.guancu.com</span><span>服务时间 工作日 09:00–18:00</span></div>
+<div class="footer-bottom"><span>&copy; <span data-year>2026</span> 莞促集团有限公司 版权所有</span><a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener">粤ICP备17159526号-1</a><span>官网 www.guancu.com</span><span>服务时间 工作日 09:00–18:00</span></div>
 </div></footer>'''
 
 
