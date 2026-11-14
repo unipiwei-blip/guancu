@@ -24,6 +24,13 @@ FRIENDS = [
     ('莞促集团', 'https://www.guancu.com/'),
 ]
 
+# 百度智能体网页客服：原样嵌入到每个页面 body 末尾（普通字符串，避免 f-string 解析花括号）
+EMBED_CODE = '''<!-- 百度智能体网页客服 -->
+<script src="https://agi-dev-platform-web.cdn.bcebos.com/ai_apaas/embed/output/embedLiteSDK.js?responseExpires=0&t=1794651707993"></script>
+<script>
+new EmbedLiteSDK({appId: 'f9b19bf7-e9f0-43ea-b76f-26f8cb3af33d', code: 'embed2S9JsbAXruurWVZsWjYz'});
+</script>'''
+
 CITY_SVG = '''<svg class="city" viewBox="0 0 1440 230" preserveAspectRatio="none" aria-hidden="true">
 <defs><linearGradient id="bld" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="rgba(96,164,255,.34)"/><stop offset="1" stop-color="rgba(255,255,255,.02)"/></linearGradient></defs>
 <g fill="url(#bld)">
@@ -514,6 +521,7 @@ def page(path, title, desc, keywords, body, page_type='WebPage', og='biz-hq.jpg'
 </main>
 {footer(base)}
 <script src="{base}assets/js/main.js" defer></script>
+{EMBED_CODE}
 </body>
 </html>
 '''
@@ -1061,6 +1069,7 @@ def build_404():
 </main>
 {footer(base)}
 <script src="{base}assets/js/main.js" defer></script>
+{EMBED_CODE}
 </body>
 </html>
 '''
