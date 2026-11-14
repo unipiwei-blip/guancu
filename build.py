@@ -1,10 +1,42 @@
 # -*- coding: utf-8 -*-
 """莞促集团官网静态站点生成器。运行后产出全部 HTML / SEO / 站点地图文件。"""
-import os, json, datetime
+import os, json, datetime, hashlib, glob
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 SITE = 'https://www.guancu.com'
 TODAY = datetime.date.today().isoformat()
+
+# CSS / JS 的资源路径。main() 会将其替换为带内容指纹的文件名，
+# 使 CDN 可以安全地对这些资源设置 immutable 长缓存；内容一变，文件名即变。
+ASSETS = {'css': 'assets/css/style.css', 'js': 'assets/js/main.js'}
+
+
+def prepare_assets():
+    """生成带内容指纹的 CSS/JS 副本并清理历史指纹文件。
+
+    原文件名 style.css / main.js 保留，便于仍在旧静态页面或其他托管平台上引用。
+    """
+    specs = [('assets/css/style.css', 'assets/css/style.{v}.css'),
+             ('assets/js/main.js', 'assets/js/main.{v}.js')]
+    digest = hashlib.md5()
+    for src, _ in specs:
+        with open(os.path.join(ROOT, src), 'rb') as fh:
+            digest.update(fh.read())
+    ver = digest.hexdigest()[:10]
+    for src, tpl in specs:
+        rel = tpl.format(v=ver)
+        folder, name = os.path.split(src)
+        stem, ext = os.path.splitext(name)
+        for old in glob.glob(os.path.join(ROOT, folder, stem + '.*' + ext)):
+            if os.path.normpath(old) != os.path.normpath(os.path.join(ROOT, rel)):
+                os.remove(old)
+        with open(os.path.join(ROOT, src), 'rb') as fh:
+            data = fh.read()
+        with open(os.path.join(ROOT, rel), 'wb') as fh:
+            fh.write(data)
+    ASSETS['css'] = 'assets/css/style.{}.css'.format(ver)
+    ASSETS['js'] = 'assets/js/main.{}.js'.format(ver)
+    return ver
 
 NAV = [
     ('首页', 'index.html', 'index'),
@@ -378,6 +410,7 @@ def head_meta(title, desc, keywords, path, og_image, page_type='website', articl
         f'<meta name="description" content="{desc}">',
         f'<meta name="keywords" content="{keywords}">',
         '<meta name="author" content="莞促集团有限公司">',
+        '<meta name="theme-color" content="#0b47d6">',
         '<meta name="robots" content="index,follow,max-image-preview:large">',
         f'<link rel="canonical" href="{canonical}">',
         '<meta property="og:locale" content="zh_CN">',
@@ -455,7 +488,7 @@ def header(base, page):
 </div></div>
 <header class="nav"><div class="container">
 <a class="brand" href="{base}index.html" aria-label="莞促集团首页">
-<img src="{base}assets/img/logo.png" alt="莞促集团标识"><span class="brand-txt"><strong>莞促集团</strong></span></a>
+<img src="{base}assets/img/logo.png" alt="莞促集团标识" width="44" height="44" decoding="async" fetchpriority="high"><span class="brand-txt"><strong>莞促集团</strong></span></a>
 <span class="brand-slogan">企业服务 · 数字赋能 · 产业投资</span>
 <nav class="nav-menu" aria-label="主导航">{links}</nav>
 <a class="btn btn-primary nav-cta" href="{base}contact.html">联系洽谈</a>
@@ -476,13 +509,13 @@ def footer(base):
     return f'''<footer class="footer"><div class="container">
 <div class="footer-top">
 <div>
-<a class="brand" href="{base}index.html"><img src="{base}assets/img/logo.png" alt="莞促集团标识"><span class="brand-txt"><strong>莞促集团</strong></span></a>
+<a class="brand" href="{base}index.html"><img src="{base}assets/img/logo.png" alt="莞促集团标识" width="44" height="44" loading="lazy" decoding="async"><span class="brand-txt"><strong>莞促集团</strong></span></a>
 <p class="footer-about">立足东莞的综合性企业服务与产业投资集团，业务涵盖企业总部管理、财税工商、知识产权、数字科技、产业投资、教育文旅与新能源。</p>
 <div class="pills"><span class="pill">企业服务</span><span class="pill">产业投资</span><span class="pill">数字赋能</span></div>
 </div>
 <div><h4>网站导航</h4><div class="f2col"><ul>{col(nav1)}</ul><ul>{col(nav2)}</ul></div></div>
 <div><h4>联系方式</h4>
-<img class="footer-qr" src="{base}assets/img/qrcode.png" alt="莞促集团官网二维码">
+<img class="footer-qr" src="{base}assets/img/qrcode.png" alt="莞促集团官网二维码" width="96" height="96" loading="lazy" decoding="async">
 <p class="footer-contact"><b>0769-85034888</b><br>咨询热线 400-800-4388<br>邮箱 v@guancu.com</p>
 </div>
 </div>
@@ -497,6 +530,7 @@ def page(path, title, desc, keywords, body, page_type='WebPage', og='biz-hq.jpg'
     base = '../' if '/' in path else ''
     meta, canonical, ogi = head_meta(title, desc, keywords, path, og, article=article)
     ld = jsonld(page_type, title, desc, canonical, path, extra=extra, article=article, breadcrumb=breadcrumb)
+    css_href, js_href = ASSETS['css'], ASSETS['js']
     doc = f'''<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -504,7 +538,7 @@ def page(path, title, desc, keywords, body, page_type='WebPage', og='biz-hq.jpg'
 <link rel="icon" href="{base}assets/img/favicon.ico" sizes="any">
 <link rel="icon" href="{base}assets/img/favicon.png" type="image/png">
 <link rel="apple-touch-icon" href="{base}assets/img/apple-touch-icon.png">
-<link rel="stylesheet" href="{base}assets/css/style.css">
+<link rel="stylesheet" href="{base}{css_href}">
 {ld}
 </head>
 <body data-page="{navkey}">
@@ -513,7 +547,7 @@ def page(path, title, desc, keywords, body, page_type='WebPage', og='biz-hq.jpg'
 {body}
 </main>
 {footer(base)}
-<script src="{base}assets/js/main.js" defer></script>
+<script src="{base}{js_href}" defer></script>
 </body>
 </html>
 '''
@@ -540,7 +574,7 @@ def page_hero(eyebrow, h1, lead, crumb, base='', compact=False):
 
 def news_card(a, base=''):
     return f'''<a class="news-card reveal" href="{base}{a['file']}">
-<div class="news-shot"><img src="{base}assets/img/{a['cover']}" alt="{a['title']}" loading="lazy"><span class="badge">{a['cat']}</span></div>
+<div class="news-shot"><img src="{base}assets/img/{a['cover']}" alt="{a['title']}" loading="lazy" decoding="async"><span class="badge">{a['cat']}</span></div>
 <div class="news-body"><div class="news-meta">{a['date']}</div>
 <div class="news-title">{a['title']}</div>
 <p class="news-excerpt">{a['excerpt']}</p>
@@ -568,7 +602,7 @@ def render_body(blocks, base):
             out.append('<ul>' + ''.join(f'<li>{x}</li>' for x in b[1]) + '</ul>')
         elif b[0] == 'figure':
             img, cap = b[1]
-            out.append(f'<figure><img src="{base}assets/img/{img}" alt="{cap}" loading="lazy"><figcaption>{cap}</figcaption></figure>')
+            out.append(f'<figure><img src="{base}assets/img/{img}" alt="{cap}" loading="lazy" decoding="async"><figcaption>{cap}</figcaption></figure>')
         elif b[0] == 'quote':
             out.append(f'<blockquote>{b[1]}</blockquote>')
     return '\n'.join(out)
@@ -703,7 +737,7 @@ def build_about():
 <p>莞促集团有限公司成立于2017年10月27日，注册资本10000万元人民币，法定代表人为谭喜，登记机关为东莞市市场监督管理局，注册地址位于广东省东莞市厚街镇将军路2号悦山花园77号楼102室。集团所属行业为商务服务业，经营范围包括企业总部管理、企业管理、信息咨询服务、企业管理咨询、酒店管理、大数据服务与互联网数据服务。</p>
 <p>集团的业务根基可追溯至2006年成立的企业事务代理机构。近二十年间，从公司注册、代理记账、财税咨询起步，逐步延伸至审计与税收筹划、知识产权与科技项目申报、数字科技与大数据服务、产业投资与园区运营、教育与文旅、新能源投资建设等领域，形成由多家成员企业分工承接、彼此支撑的业务格局。</p>
 <p>公开工商信息显示，集团拥有9家控股子公司，业务主体覆盖企业服务、财税、知识产权、网络科技、教育投资、文旅发展、建筑劳务与新能源等方向；同时通过产业投资，与东莞市昂图智能科技有限公司等优秀智造企业建立连接。集团还持有代理记账许可证，并积累了多项作品著作权。</p>
-<figure><img src="assets/img/about-visit.jpg" alt="集团学习交流活动现场" loading="lazy"><figcaption>集团赴投资企业开展学习交流</figcaption></figure>
+<figure><img src="assets/img/about-visit.jpg" alt="集团学习交流活动现场" loading="lazy" decoding="async"><figcaption>集团赴投资企业开展学习交流</figcaption></figure>
 </div>
 </div></section>
 
@@ -738,7 +772,7 @@ def build_about():
 # ---------------------------------------------------------------- 业务板块
 def build_services():
     blocks = ''.join(f'''<a class="biz-card reveal" id="s{int(s['num'])}" href="contact.html">
-<div class="biz-photo"><img src="assets/img/{s['img']}" alt="{s['name']}" loading="lazy"></div>
+<div class="biz-photo"><img src="assets/img/{s['img']}" alt="{s['name']}" loading="lazy" decoding="async"></div>
 <span class="num">SERVICE {s['num']}</span><h3 class="h3">{s['name']}</h3>
 <p>{s['detail']}</p>
 <ul>{''.join(f'<li>{x}</li>' for x in s['points'])}</ul>
@@ -914,7 +948,7 @@ def build_article(a):
 <section class="section tight news-list-section"><div class="container">
 <div class="article-head"><h1 class="h2">{a['title']}</h1>
 <div class="article-meta"><span>发布日期：{a['date']}</span><span>栏目：<a href="{cat_url}">{a['cat']}</a></span><span>莞促集团</span></div></div>
-<div class="article-cover"><img src="../assets/img/{a['cover']}" alt="{a['title']}"></div>
+<div class="article-cover"><img src="../assets/img/{a['cover']}" alt="{a['title']}" fetchpriority="high" decoding="async"></div>
 <div class="prose">{content}</div>
 <div class="article-nav"><a class="btn btn-ghost" href="../news.html">返回资讯列表</a><a class="btn btn-ghost" href="{cat_url}">查看{a['cat']}分类</a><a class="btn btn-primary" href="../contact.html">业务咨询</a></div>
 <div class="tag-list" style="margin:30px 0 0"><span class="pill">相关资讯</span>{rel_html}</div>
@@ -1017,7 +1051,7 @@ def build_sitemap_page():
 
 {cta_block('需要帮助？', '如果一时没有找到想要的内容，欢迎直接与集团联系。')}'''
     return page('sitemap.html', '网站地图｜莞促集团全站页面与文章入口',
-                '莞促集团官网网站地图，汇总主导航栏目、六大业务板块、集团成员企业分组与9篇新闻资讯文章的全部入口。',
+                f'莞促集团官网网站地图，汇总主导航栏目、六大业务板块、集团成员企业分组与{len(ARTICLES)}篇新闻资讯文章的全部入口。',
                 '莞促集团网站地图,sitemap,全站导航,栏目索引',
                 body, 'WebPage', 'biz-arch.jpg', 'sitemap',
                 breadcrumb=[('首页', ''), ('网站地图', 'sitemap.html')])
@@ -1025,16 +1059,21 @@ def build_sitemap_page():
 
 # ---------------------------------------------------------------- 404
 def build_404():
-    """独立生成 404：noindex,follow、无 canonical/OG/结构化数据、无自动跳转，仅普通链接入口。"""
-    base = ''
+    """独立生成 404：noindex,follow、无 canonical/OG/结构化数据、无自动跳转，仅普通链接入口。
+
+    全部链接与资源使用站点根目录绝对路径：浏览器地址仍停留在用户请求的不存在路径
+    （可能是 /news/xxx/yyy 这样的深层地址），相对路径会被解析到错误目录。
+    """
+    base = '/'
+    css_href, js_href = ASSETS['css'], ASSETS['js']
     links = ''.join(
-        f'<a class="card" href="{f}"><span class="num">LINK {i+1:02d}</span><h3 class="h3">{n}</h3></a>'
+        f'<a class="card" href="{base}{f}"><span class="num">LINK {i+1:02d}</span><h3 class="h3">{n}</h3></a>'
         for i, (n, f, k) in enumerate(NAV))
     body = f'''<section class="page-hero"><div class="container">
 <span class="eyebrow">404 / PAGE NOT FOUND</span>
 <h1 class="h2" style="font-size:clamp(30px,3.6vw,48px)">页面暂时无法访问</h1>
 <p class="lead">您访问的页面不存在或已调整位置，请从首页、网站地图或下方栏目入口继续浏览。</p>
-<div class="article-nav"><a class="btn btn-primary" href="index.html">返回首页</a><a class="btn btn-ghost" href="sitemap.html">查看网站地图</a></div>
+<div class="article-nav"><a class="btn btn-primary" href="{base}index.html">返回首页</a><a class="btn btn-ghost" href="{base}sitemap.html">查看网站地图</a></div>
 </div></section>
 
 <section class="section tight"><div class="container">
@@ -1052,7 +1091,7 @@ def build_404():
 <link rel="icon" href="{base}assets/img/favicon.ico" sizes="any">
 <link rel="icon" href="{base}assets/img/favicon.png" type="image/png">
 <link rel="apple-touch-icon" href="{base}assets/img/apple-touch-icon.png">
-<link rel="stylesheet" href="{base}assets/css/style.css">
+<link rel="stylesheet" href="{base}{css_href}">
 </head>
 <body data-page="">
 {header(base, '')}
@@ -1060,7 +1099,7 @@ def build_404():
 {body}
 </main>
 {footer(base)}
-<script src="{base}assets/js/main.js" defer></script>
+<script src="{base}{js_href}" defer></script>
 </body>
 </html>
 '''
@@ -1116,10 +1155,8 @@ Sitemap: {SITE}/sitemap.xml
 '''
     with open(os.path.join(ROOT, 'robots.txt'), 'w', encoding='utf-8') as f:
         f.write(robots)
-    with open(os.path.join(ROOT, 'CNAME'), 'w', encoding='utf-8') as f:
-        f.write('www.guancu.com\n')
-    with open(os.path.join(ROOT, '.nojekyll'), 'w', encoding='utf-8') as f:
-        f.write('')
+    # 站点已迁至 EdgeOne Pages（直接上传 ZIP/Folder 部署），自定义域名在控制台绑定。
+    # 不再生成 GitHub Pages 专用的 CNAME / .nojekyll。
     # 便于提交到百度资源搜索平台 / Google Search Console 的 URL 清单
     all_urls = [SITE + '/' + p for p in paths if p != '404.html']
     with open(os.path.join(ROOT, 'urls.txt'), 'w', encoding='utf-8') as f:
@@ -1132,6 +1169,7 @@ Sitemap: {SITE}/sitemap.xml
 
 
 def main():
+    ver = prepare_assets()
     paths = []
     paths.append(build_index())
     paths.append(build_about())
@@ -1147,6 +1185,7 @@ def main():
         paths.append(build_category(name, slug, desc))
     paths.append(build_404())
     n = build_seo_files(paths)
+    print('静态资源指纹：', ver, '→', ASSETS['css'], '/', ASSETS['js'])
     print('生成页面：', len(paths), '个 HTML；sitemap.xml 收录：', n, '个 URL')
     print('新闻文章：', len(ARTICLES), '篇；列表分页：', NEWS_PAGES, '页；文章分类：', len(CATEGORIES), '个')
     for p in paths:
