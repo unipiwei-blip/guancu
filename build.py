@@ -46,6 +46,10 @@ def prepare_assets():
 SHARE_IMAGE_SRC = 'share-brand.jpg'
 SHARE_IMAGE = SHARE_IMAGE_SRC
 
+# 独立电子名片：文件由外部提供，整目录随站点一起发布，不由 page() 生成。
+# index.html 为 tanxi.html 的入口副本（其 canonical 指向 tanxi.html）。
+EXTRA_URLS = ['mp/tanxi.html', 'mp/index.html']
+
 
 def prepare_share_image():
     """为统一分享图生成内容指纹副本，并清理历史版本。"""
@@ -1071,12 +1075,12 @@ def build_sitemap_page():
     news_b = ''.join(f'<a href="{a["file"]}">{a["title"]}</a>' for a in ARTICLES[half:])
     cats = ''.join(f'<a href="{cat_file(slug)}">{name}（{cat_count(name)}）</a>'
                    for name, slug, _ in CATEGORIES)
-    total_pages = 7 + (NEWS_PAGES - 1) + len(ARTICLES) + len(CATEGORIES)
+    total_pages = 7 + (NEWS_PAGES - 1) + len(ARTICLES) + len(CATEGORIES) + len(EXTRA_URLS)
     body = f'''{page_hero('SITEMAP / 网站地图', '全站内容，一页可达', '按栏目整理的全部页面与文章入口，方便快速定位所需信息。', '网站地图')}
 
 <section class="section tight"><div class="container">
 <div class="sitemap-grid">
-<div class="sitemap-box reveal"><h3>主导航栏目</h3><a href="index.html">首页</a>{main}{pages}</div>
+<div class="sitemap-box reveal"><h3>主导航栏目</h3><a href="index.html">首页</a>{main}{pages}<a href="mp/tanxi.html">电子名片</a></div>
 <div class="sitemap-box reveal"><h3>业务板块</h3>{svc}</div>
 <div class="sitemap-box reveal"><h3>集团版图</h3>{grp}</div>
 </div>
@@ -1149,8 +1153,9 @@ def build_404():
 
 # ---------------------------------------------------------------- SEO 文件
 def build_seo_files(paths):
+    all_paths = list(paths) + EXTRA_URLS
     urls = []
-    for p in paths:
+    for p in all_paths:
         if p == '404.html':
             continue
         loc = SITE + '/' + p
@@ -1162,7 +1167,7 @@ def build_seo_files(paths):
             pri, freq = '0.5', 'weekly'
         elif p.startswith('category/'):
             pri, freq = '0.7', 'weekly'
-        elif p.startswith('news/'):
+        elif p.startswith('news/') or p.startswith('mp/'):
             pri, freq = '0.6', 'monthly'
         else:
             pri, freq = '0.8', 'monthly'
@@ -1197,7 +1202,7 @@ Sitemap: {SITE}/sitemap.xml
     # 站点已迁至 EdgeOne Pages（直接上传 ZIP/Folder 部署），自定义域名在控制台绑定。
     # 不再生成 GitHub Pages 专用的 CNAME / .nojekyll。
     # 便于提交到百度资源搜索平台 / Google Search Console 的 URL 清单
-    all_urls = [SITE + '/' + p for p in paths if p != '404.html']
+    all_urls = [SITE + '/' + p for p in all_paths if p != '404.html']
     with open(os.path.join(ROOT, 'urls.txt'), 'w', encoding='utf-8') as f:
         f.write('\n'.join(all_urls) + '\n')
     news_urls = ([SITE + '/' + a['file'] for a in ARTICLES]
