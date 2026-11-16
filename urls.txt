@@ -1,5 +1,6 @@
 https://www.guancu.com/
 https://www.guancu.com/about.html
+https://www.guancu.com/about/tanxi.html
 https://www.guancu.com/services.html
 https://www.guancu.com/companies.html
 https://www.guancu.com/news.html
@@ -38,5 +39,6 @@ https://www.guancu.com/category/industry-investment.html
 https://www.guancu.com/category/industry-insight.html
 https://www.guancu.com/category/exchange.html
 https://www.guancu.com/category/announcements.html
+https://www.guancu.com/about/tanxi.html
 https://www.guancu.com/mp/tanxi.html
 https://www.guancu.com/mp/index.html
