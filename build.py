@@ -103,6 +103,50 @@ CITY_SVG = '''<svg class="city" viewBox="0 0 1440 230" preserveAspectRatio="none
 </g></svg>'''
 
 
+LANDMARK_SVG = '''<svg class="landmark" viewBox="0 0 1200 560" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+<defs>
+<linearGradient id="lmFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="rgba(96,164,255,.15)"/><stop offset="1" stop-color="rgba(96,164,255,0)"/></linearGradient>
+<linearGradient id="lmLine" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="rgba(26,107,255,.38)"/><stop offset="1" stop-color="rgba(26,107,255,.10)"/></linearGradient>
+</defs>
+<g fill="none" stroke="url(#lmLine)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+<path d="M0 486 Q110 448 200 466 Q300 398 392 440 Q478 374 566 432 Q672 366 760 424 Q860 382 948 430 Q1060 400 1200 452 L1200 560 L0 560 Z" fill="url(#lmFill)" stroke="none"/>
+<path d="M0 486 Q110 448 200 466 Q300 398 392 440 Q478 374 566 432 Q672 366 760 424 Q860 382 948 430 Q1060 400 1200 452" stroke="rgba(26,107,255,.22)" stroke-width="1.5"/>
+<g stroke-width="1.8">
+<path d="M92 476 L92 404 M116 476 L116 404 M140 476 L140 404 M164 476 L164 404"/>
+<path d="M78 404 Q128 374 178 404 M68 396 Q128 356 188 396"/>
+<path d="M88 386 Q128 352 168 386 M96 374 Q128 344 160 374"/>
+<path d="M128 344 L128 326 M118 330 L138 330"/>
+<path d="M200 476 L200 424 L226 424 L226 476 M196 424 Q213 410 230 424"/>
+<path d="M250 476 L250 440 L272 440 L272 476 M246 440 Q261 428 276 440"/>
+<path d="M70 476 L290 476"/>
+</g>
+<g stroke-width="2.2">
+<path d="M556 476 L556 214 L578 152 L600 112 L622 152 L644 214 L644 476"/>
+<path d="M600 112 L600 64 M592 78 L608 78"/>
+<path d="M566 260 L634 260 M566 318 L634 318 M572 382 L628 382"/>
+<path d="M580 214 L620 214 M584 168 L616 168"/>
+<path d="M656 476 L656 292 L674 262 L692 292 L692 476"/>
+<path d="M660 340 L688 340 M660 402 L688 402"/>
+<path d="M704 476 L704 350 L720 330 L736 350 L736 476"/>
+<path d="M540 476 L750 476"/>
+</g>
+<g stroke-width="1.8">
+<path d="M958 476 L958 252 L974 228 L990 252 L990 476"/>
+<path d="M974 236 L816 424 M974 236 L860 424 M974 236 L902 424 M974 236 L1046 424 M974 236 L1088 424 M974 236 L1132 424"/>
+<path d="M800 424 L1160 424 M800 434 L1160 434"/>
+<path d="M834 434 L834 476 M1114 434 L1114 476"/>
+<path d="M940 476 L940 434 M1008 476 L1008 434"/>
+<path d="M974 252 L974 424"/>
+</g>
+<g stroke-width="1.4" opacity=".7">
+<path d="M772 476 L772 396 L786 380 L800 396 L800 476 M776 420 L796 420"/>
+<path d="M820 476 L820 414 L834 400 L848 414 L848 476"/>
+<path d="M1128 476 L1128 404 L1142 388 L1156 404 L1156 476"/>
+</g>
+</g>
+</svg>'''
+
+
 def T(text, **kw):
     for k, v in kw.items():
         text = text.replace('{{' + k + '}}', str(v))
@@ -716,6 +760,7 @@ def build_index():
     faq = ''.join(f'<details class="reveal"><summary>{q}</summary><p>{a}</p></details>' for q, a in FAQ)
     body = f'''<section class="hero"><div class="hero-bg"><div class="glow g1"></div><div class="glow g2"></div><div class="glow g3"></div>{CITY_SVG}</div>
 <div class="container">
+{LANDMARK_SVG}
 <span class="eyebrow">GUANCU GROUP · DONGGUAN</span>
 <h1 class="h1">扎根东莞，<br>与<span class="h2 grad">产业共同成长</span></h1>
 <p class="lead">从企业事务代理起步，莞促集团已形成覆盖企业服务、财税工商、知识产权、数字科技、产业投资与教育文旅的协同格局，以19家成员与投资企业，为湾区企业提供全周期专业支持。</p>
@@ -727,11 +772,11 @@ def build_index():
 <div class="stat"><b>6 大</b><span>业务板块</span></div>
 </div>
 <div class="float-tag f1">企业服务 · 财税 · 知识产权</div>
-<div class="float-tag f2">总部管理 · 组织咨询 · 流程梳理</div>
-<div class="float-tag f3">19 家成员企业 · 六大板块协同</div>
+<div class="float-tag f2">总部管理 · 组织咨询</div>
+<div class="float-tag f3">19 家成员企业</div>
 <div class="float-tag f4">数字科技 · 产业投资</div>
-<div class="float-tag f5">教育文旅 · 影视传媒 · 新能源</div>
-<div class="float-tag f6">园区运营 · 光伏储能 · 智造投资</div>
+<div class="float-tag f5">教育文旅 · 新能源</div>
+<div class="float-tag f6">园区运营 · 光伏储能</div>
 </div></section>
 
 <section class="section tight"><div class="container">
