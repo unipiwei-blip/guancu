@@ -718,7 +718,7 @@ def build_index():
 <div class="container">
 <span class="eyebrow">GUANCU GROUP · DONGGUAN</span>
 <h1 class="h1">扎根东莞，<br>与<span class="h2 grad">产业共同成长</span></h1>
-<p class="lead">莞促集团以企业服务为根基，延伸至数字科技、产业投资、教育文旅与新能源，形成多主体协同的产业服务版图，持续为湾区企业提供专业支持。</p>
+<p class="lead">从企业事务代理起步，莞促集团已形成覆盖企业服务、财税工商、知识产权、数字科技、产业投资与教育文旅的协同格局，以19家成员与投资企业，为湾区企业提供全周期专业支持。</p>
 <div class="hero-actions"><a class="btn btn-primary btn-lg" href="about.html">了解集团概览</a><a class="btn btn-ghost btn-lg" href="services.html">浏览业务板块</a></div>
 <div class="hero-stats">
 <div class="stat"><b>2017</b><span>集团成立年份</span></div>
@@ -726,8 +726,8 @@ def build_index():
 <div class="stat"><b>9 家</b><span>控股子公司</span></div>
 <div class="stat"><b>6 大</b><span>业务板块</span></div>
 </div>
-<div class="float-tag f1">企业服务 · 财税 · 知识产权</div>
-<div class="float-tag f2">数字科技 · 产业投资</div>
+<div class="float-tag f1"><b>企业服务 · 财税 · 知识产权</b><span>从设立到合规，陪企业走稳每一步</span></div>
+<div class="float-tag f2"><b>数字科技 · 产业投资</b><span>以数字化与资本，连接产业新机会</span></div>
 </div></section>
 
 <section class="section tight"><div class="container">
