@@ -428,7 +428,8 @@ COMPANY_GROUPS = [
 # ---------------------------------------------------------------- 组件
 def head_meta(title, desc, keywords, path, og_image=None, page_type='website', article=None):
     """og_image 参数保留以兼容现有调用；分享缩略图统一由 SHARE_IMAGE 指定。"""
-    canonical = SITE + '/' + path if path else SITE + '/'
+    # 首页 canonical 统一到站点根，避免 / 与 /index.html 两个地址分散权重
+    canonical = SITE + '/' if path in ('index.html', '') else SITE + '/' + path
     ogi = SITE + '/assets/img/' + SHARE_IMAGE
     share_title = article['title'] if article else title
     share_desc = desc[:60].rstrip('，,。；;、：: ')
@@ -520,12 +521,14 @@ def jsonld(page_type, title, desc, canonical, path, extra=None, article=None, br
 
 
 def header(base, page):
-    links = ''.join(f'<a href="{base}{f}" data-nav="{k}">{n}</a>' for n, f, k in NAV)
+    # 首页入口统一用站点根，其余栏目沿用相对路径，保持权重集中到 /
+    links = ''.join(f'<a href="{"/" if k == "index" else base + f}" data-nav="{k}">{n}</a>'
+                    for n, f, k in NAV)
     return f'''<div class="topbar"><div class="container">
 <span><i class="spark"></i><b>莞促集团</b>　企业服务 · 数字赋能 · 产业投资<span class="hide-sm">　|　扎根东莞，服务粤港澳大湾区</span></span>
 </div></div>
 <header class="nav"><div class="container">
-<a class="brand" href="{base}index.html" aria-label="莞促集团首页">
+<a class="brand" href="/" aria-label="莞促集团首页">
 <img src="{base}assets/img/logo.png" alt="莞促集团标识" width="44" height="44" decoding="async" fetchpriority="high"><span class="brand-txt"><strong>莞促集团</strong></span></a>
 <span class="brand-slogan">企业服务 · 数字赋能 · 产业投资</span>
 <nav class="nav-menu" aria-label="主导航">{links}</nav>
@@ -541,13 +544,14 @@ def footer(base):
         out = []
         for n in names:
             f = next(x[1] for x in NAV if x[0] == n)
-            out.append(f'<li><a href="{base}{f}">{n}</a></li>')
+            out.append(f'<li><a href="/">{n}</a></li>' if f == 'index.html'
+                       else f'<li><a href="{base}{f}">{n}</a></li>')
         return ''.join(out)
     friends = ''.join(f'<a href="{u}" target="_blank" rel="noopener">{n}</a>' for n, u in FRIENDS)
     return f'''<footer class="footer"><div class="container">
 <div class="footer-top">
 <div>
-<a class="brand" href="{base}index.html"><img src="{base}assets/img/logo.png" alt="莞促集团标识" width="44" height="44" loading="lazy" decoding="async"><span class="brand-txt"><strong>莞促集团</strong></span></a>
+<a class="brand" href="/"><img src="{base}assets/img/logo.png" alt="莞促集团标识" width="44" height="44" loading="lazy" decoding="async"><span class="brand-txt"><strong>莞促集团</strong></span></a>
 <p class="footer-about">立足东莞的综合性企业服务与产业投资集团，业务涵盖企业总部管理、财税工商、知识产权、数字科技、产业投资、教育文旅与新能源。</p>
 <div class="pills"><span class="pill">企业服务</span><span class="pill">产业投资</span><span class="pill">数字赋能</span></div>
 </div>
@@ -611,7 +615,7 @@ def page_hero(eyebrow, h1, lead, crumb, base='', compact=False):
     return f'''<section class="{cls}"><div class="container">
 <span class="eyebrow">{eyebrow}</span><h1 class="h2" style="font-size:clamp(30px,3.6vw,48px)">{h1}</h1>
 <p class="lead">{lead}</p>
-<div class="breadcrumb"><a href="{base}index.html">首页</a><span>/</span>{crumb}</div>
+<div class="breadcrumb"><a href="/">首页</a><span>/</span>{crumb}</div>
 </div></section>'''
 
 
@@ -985,7 +989,7 @@ def build_article(a):
     cat_url = f'../{cat_file(CAT_SLUG[a["cat"]])}'
     body = f'''<section class="page-hero compact"><div class="container">
 <span class="eyebrow">NEWS / <a href="{cat_url}">{a['cat']}</a></span>
-<div class="breadcrumb"><a href="../index.html">首页</a><span>/</span><a href="../news.html">新闻资讯</a><span>/</span><a href="{cat_url}">{a['cat']}</a><span>/</span>正文</div>
+<div class="breadcrumb"><a href="/">首页</a><span>/</span><a href="../news.html">新闻资讯</a><span>/</span><a href="{cat_url}">{a['cat']}</a><span>/</span>正文</div>
 </div></section>
 
 <section class="section tight news-list-section"><div class="container">
@@ -1080,7 +1084,7 @@ def build_sitemap_page():
 
 <section class="section tight"><div class="container">
 <div class="sitemap-grid">
-<div class="sitemap-box reveal"><h3>主导航栏目</h3><a href="index.html">首页</a>{main}{pages}<a href="mp/tanxi.html">电子名片</a></div>
+<div class="sitemap-box reveal"><h3>主导航栏目</h3><a href="/">首页</a>{main}{pages}<a href="mp/tanxi.html">电子名片</a></div>
 <div class="sitemap-box reveal"><h3>业务板块</h3>{svc}</div>
 <div class="sitemap-box reveal"><h3>集团版图</h3>{grp}</div>
 </div>
@@ -1110,13 +1114,15 @@ def build_404():
     base = '/'
     css_href, js_href = ASSETS['css'], ASSETS['js']
     links = ''.join(
+        f'<a class="card" href="/"><span class="num">LINK {i+1:02d}</span><h3 class="h3">{n}</h3></a>'
+        if f == 'index.html' else
         f'<a class="card" href="{base}{f}"><span class="num">LINK {i+1:02d}</span><h3 class="h3">{n}</h3></a>'
         for i, (n, f, k) in enumerate(NAV))
     body = f'''<section class="page-hero"><div class="container">
 <span class="eyebrow">404 / PAGE NOT FOUND</span>
 <h1 class="h2" style="font-size:clamp(30px,3.6vw,48px)">页面暂时无法访问</h1>
 <p class="lead">您访问的页面不存在或已调整位置，请从首页、网站地图或下方栏目入口继续浏览。</p>
-<div class="article-nav"><a class="btn btn-primary" href="{base}index.html">返回首页</a><a class="btn btn-ghost" href="{base}sitemap.html">查看网站地图</a></div>
+<div class="article-nav"><a class="btn btn-primary" href="/">返回首页</a><a class="btn btn-ghost" href="{base}sitemap.html">查看网站地图</a></div>
 </div></section>
 
 <section class="section tight"><div class="container">
@@ -1158,7 +1164,7 @@ def build_seo_files(paths):
     for p in all_paths:
         if p == '404.html':
             continue
-        loc = SITE + '/' + p
+        loc = SITE + '/' if p == 'index.html' else SITE + '/' + p
         if p == 'index.html':
             pri, freq = '1.0', 'weekly'
         elif p in ('news.html', 'sitemap.html'):
@@ -1202,7 +1208,8 @@ Sitemap: {SITE}/sitemap.xml
     # 站点已迁至 EdgeOne Pages（直接上传 ZIP/Folder 部署），自定义域名在控制台绑定。
     # 不再生成 GitHub Pages 专用的 CNAME / .nojekyll。
     # 便于提交到百度资源搜索平台 / Google Search Console 的 URL 清单
-    all_urls = [SITE + '/' + p for p in all_paths if p != '404.html']
+    all_urls = [SITE + '/' if p == 'index.html' else SITE + '/' + p
+                for p in all_paths if p != '404.html']
     with open(os.path.join(ROOT, 'urls.txt'), 'w', encoding='utf-8') as f:
         f.write('\n'.join(all_urls) + '\n')
     news_urls = ([SITE + '/' + a['file'] for a in ARTICLES]
