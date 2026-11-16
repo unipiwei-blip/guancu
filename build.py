@@ -826,7 +826,7 @@ def build_tanxi_profile():
     """谭喜人物资料页：照片与三段简介，简洁呈现。"""
     base = ''
     body = f'''{page_hero('PROFILE / 董事长', '谭喜', '莞促集团董事长',
-                  '<a href="../about.html">集团概览</a><span>/</span>董事长谭喜', base=base)}
+                  '<a href="../about.html">集团概览</a><span>/</span>董事长谭喜', base=base, compact=True)}
 
 <section class="section tight"><div class="container">
 <div class="profile-card reveal">
@@ -851,7 +851,7 @@ def build_tanxi_profile():
     return page('about/tanxi.html', '谭喜｜莞促集团董事长、广东科技学院创新创业校外导师',
                 '谭喜，莞促集团有限公司董事长、法定代表人。2019年受聘为广东科技学院创新创业校外导师，长期从事企业服务与产业投资相关工作。',
                 '谭喜,莞促集团董事长,莞促集团有限公司,广东科技学院创业导师,谭喜人物资料',
-                body, 'WebPage', 'about-visit.jpg', 'about', extra=person,
+                body, 'WebPage', 'about-visit.jpg', 'profile', extra=person,
                 breadcrumb=[('首页', ''), ('集团概览', 'about.html'), ('董事长谭喜', 'about/tanxi.html')])
 
 
