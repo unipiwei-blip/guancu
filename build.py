@@ -726,8 +726,12 @@ def build_index():
 <div class="stat"><b>9 家</b><span>控股子公司</span></div>
 <div class="stat"><b>6 大</b><span>业务板块</span></div>
 </div>
-<div class="float-tag f1"><b>企业服务 · 财税 · 知识产权</b><span>从设立到合规，陪企业走稳每一步</span></div>
-<div class="float-tag f2"><b>数字科技 · 产业投资</b><span>以数字化与资本，连接产业新机会</span></div>
+<div class="float-tag f1">企业服务 · 财税 · 知识产权</div>
+<div class="float-tag f2">总部管理 · 组织咨询 · 流程梳理</div>
+<div class="float-tag f3">19 家成员企业 · 六大板块协同</div>
+<div class="float-tag f4">数字科技 · 产业投资</div>
+<div class="float-tag f5">教育文旅 · 影视传媒 · 新能源</div>
+<div class="float-tag f6">园区运营 · 光伏储能 · 智造投资</div>
 </div></section>
 
 <section class="section tight"><div class="container">
