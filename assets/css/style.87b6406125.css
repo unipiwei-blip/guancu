@@ -406,7 +406,7 @@ a.pill:hover{background:var(--blue);color:#fff;border-color:var(--blue);transfor
 .prose sup{color:var(--blue);font-weight:800;font-size:11px}
 .profile-card{max-width:900px;margin:0 auto;background:rgba(255,255,255,.86);border:1px solid rgba(255,255,255,.92);border-radius:28px;box-shadow:var(--shadow-lg);padding:48px 42px;text-align:center}
 .profile-text{max-width:720px;margin:0 auto}
-.profile-text p{font-size:15px;line-height:2.05;color:#3c5274;margin:18px auto;text-align:center}
+.profile-text p{font-size:15px;line-height:2.05;color:#3c5274;margin:18px 0;text-align:left;text-indent:2em}
 body[data-page="profile"] .page-hero.compact{padding:22px 0 14px}
 body[data-page="profile"] .page-hero.compact .breadcrumb{margin-top:10px}
 body[data-page="profile"] .page-hero.compact .h1,
