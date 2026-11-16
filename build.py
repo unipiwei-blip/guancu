@@ -883,7 +883,7 @@ def build_tanxi_profile():
 
 # ---------------------------------------------------------------- 业务板块
 def build_services():
-    blocks = ''.join(f'''<a class="biz-card reveal" id="s{int(s['num'])}" href="contact.html">
+    blocks = ''.join(f'''<a class="biz-card reveal" id="s{int(s['num'])}" href="services/{SERVICE_DETAIL[s['num']]['slug']}.html">
 <div class="biz-photo"><img src="assets/img/{s['img']}" alt="{s['name']}" loading="lazy" decoding="async"></div>
 <span class="num">SERVICE {s['num']}</span><h3 class="h3">{s['name']}</h3>
 <p>{s['detail']}</p>
@@ -901,7 +901,7 @@ def build_services():
 <h3 class="h3">{t}</h3><p>{d}</p></div>''' for i, (t, d) in enumerate(promise))
     itemlist = {'@type': 'ItemList', 'name': '莞促集团六大业务板块',
                 'itemListElement': [{'@type': 'ListItem', 'position': i + 1, 'name': s['name'],
-                                     'description': s['desc'], 'url': SITE + '/services.html#s' + str(int(s['num']))}
+                                     'description': s['desc'], 'url': SITE + '/services/' + SERVICE_DETAIL[s['num']]['slug'] + '.html'}
                                     for i, s in enumerate(SERVICES)]}
     body = f'''{page_hero('SERVICES / 业务板块', '六大板块，覆盖企业成长全程', '企业服务、财税工商、知识产权、数字科技、产业投资与教育文旅，由专业成员企业分别承接、协同推进。', '业务板块')}
 
@@ -933,6 +933,194 @@ def build_services():
                 breadcrumb=[('首页', ''), ('业务板块', 'services.html')])
 
 
+# ---------------------------------------------------------------- 业务详情页
+SERVICE_DETAIL = {
+    '01': dict(slug='headquarters', title='企业总部管理与咨询',
+               intro='围绕集团化管控与组织效率，提供总部架构设计、经营诊断与管理流程梳理，帮助多主体企业在扩张阶段建立清晰、可执行的协作机制。',
+               scenes=['集团总部与多主体企业的管控架构设计', '组织职责、权责边界与汇报关系梳理',
+                       '经营诊断、流程优化与信息化建设规划'],
+               deliver='组织方案、职责说明、流程文件与阶段诊断建议。',
+               group='企业服务与连锁管理'),
+    '02': dict(slug='finance', title='财税与工商服务',
+               intro='由持证与备案机构承接，覆盖公司设立、代理记账、审计税筹、财税培训与各类资质办理，为企业从设立到日常经营提供连续的合规支持。',
+               scenes=['公司注册、变更、注销与工商事务办理', '代理记账、审计与税收筹划',
+                       '许可证与经营资质办理、财税培训'],
+               deliver='工商登记与财务税务资料、审计报告、资质办理结果及后续跟进建议。',
+               group='财税与商务代理'),
+    '03': dict(slug='ip', title='知识产权与科技申报',
+               intro='由备案代理机构提供商标、专利、著作权等知识产权服务，并延伸至高新技术企业认定与科技项目申报，保护创新成果、对接政策资源。',
+               scenes=['商标查询、注册、续展、转让与维权辅助', '专利申请、软件著作权与版权登记',
+                       '高新技术企业认定、双软认定与科技项目申报'],
+               deliver='申请文件、进度同步、权利证书与申报结果反馈。',
+               group='知识产权与数字科技'),
+    '04': dict(slug='digital', title='数字科技与大数据服务',
+               intro='围绕企业经营数据的采集、治理与应用，提供大数据服务、互联网数据服务、电子商务平台与软件开发、信息系统集成与云计算服务。',
+               scenes=['数据采集、治理与应用支持', '电子商务平台与业务软件开发',
+                       '信息系统集成、云计算与数字化升级'],
+               deliver='数据服务成果、软件系统、集成方案与运维支持。',
+               group='知识产权与数字科技'),
+    '05': dict(slug='investment', title='产业投资与园区运营',
+               intro='以产业投资连接资本与实体，关注智能制造、新能源等方向的优质企业；同时开展产业园区管理、载体运营，并参与光伏发电及储能电站项目投资建设。',
+               scenes=['优质智造企业投资与投后协同', '产业园区管理与载体运营',
+                       '光伏发电及储能电站项目投资、建设与总承包'],
+               deliver='投资对接、园区运营方案与新能源项目协同推进。',
+               group='新能源与产业投资'),
+    '06': dict(slug='culture', title='教育与文旅发展',
+               intro='通过教育投资、文旅项目开发与影视传媒等成员企业，承接教育项目、文旅空间与品牌内容相关业务，形成面向人才、文化与城市生活的服务延伸。',
+               scenes=['教育项目投资与办学服务协同', '文旅项目开发与空间运营',
+                       '影视传媒、品牌内容与传播服务'],
+               deliver='项目方案、运营协同与品牌内容交付。',
+               group='教育与文旅'),
+}
+SERVICE_BY_SLUG = {d['slug']: (s, d) for s in SERVICES for d in [SERVICE_DETAIL[s['num']]]}
+
+
+def build_service_detail(slug):
+    s, d = SERVICE_BY_SLUG[slug]
+    num = s['num']
+    path = 'services/' + slug + '.html'
+    steps = [('01', '需求沟通', '明确业务类型与时间要求'), ('02', '专业诊断', '梳理现状与所需材料'),
+             ('03', '方案确认', '确定服务范围与责任团队'), ('04', '服务实施', '按节点推进并同步进度'),
+             ('05', '交付跟进', '成果交付与后续支持')]
+    flow = ''.join(f'''<div class="flow-step reveal"><div class="flow-dot">{n}</div><div class="h3">{t}</div><p>{x}</p></div>'''
+                   for n, t, x in steps)
+    scene_cards = ''.join(f'<div class="card reveal"><span class="num">CASE {i+1:02d}</span><h3 class="h3">{x}</h3></div>'
+                          for i, x in enumerate(d['scenes']))
+    peers = ''.join(f'<a class="chip" href="{other[1]["slug"]}.html">{other[1]["title"]}</a>'
+                    for other in SERVICE_BY_SLUG.values() if other[0]['num'] != num)
+    service = {'@type': 'Service', 'name': s['name'], 'description': s['detail'],
+               'provider': {'@id': SITE + '/#organization'},
+               'areaServed': '广东省东莞市',
+               'url': SITE + '/' + path}
+    body = f'''{page_hero('SERVICE / ' + num, s['name'], s['desc'],
+                  f'<a href="/">首页</a><span>/</span><a href="../services.html">业务板块</a><span>/</span>{s["name"]}')}
+
+<section class="section tight"><div class="container">
+<div class="prose">
+<p>{d['intro']}</p>
+<figure><img src="../assets/img/{s['img']}" alt="{s['name']}" loading="lazy" decoding="async">
+<figcaption>{s['name']}服务场景</figcaption></figure>
+</div>
+</div></section>
+
+<section class="section tight"><div class="container">
+{sec_head('SCOPE / 服务范围', '可提供的<span class="blue">具体事项</span>')}
+<div class="grid-2" style="text-align:center">{''.join(f'<div class="card reveal"><span class="num">ITEM {i+1:02d}</span><h3 class="h3">{x}</h3></div>' for i, x in enumerate(s['points']))}</div>
+</div></section>
+
+<section class="section tight"><div class="container">
+{sec_head('SCENES / 适用场景', '常见需求<span class="pink">由此切入</span>')}
+<div class="grid-2" style="text-align:center">{scene_cards}</div>
+<p class="note" style="margin-top:20px">交付内容：{d['deliver']}</p>
+</div></section>
+
+<section class="section tight"><div class="container">
+{sec_head('PROCESS / 服务流程', '五个节点，<span class="grad">过程可预期</span>')}
+<div class="flow">{flow}</div>
+</div></section>
+
+<section class="section tight"><div class="container">
+{sec_head('TEAM / 承接主体', '由「' + d['group'] + '」板块成员企业协同承接')}
+<p class="note">相关成员企业信息可在<a href="../companies.html">成员企业</a>栏目查阅，具体对接团队将根据业务类型与所在地安排。</p>
+</div></section>
+
+<section class="section tight"><div class="container">
+<div class="sitemap-box reveal" style="text-align:center"><h3>其他业务板块</h3><div class="tag-list" style="justify-content:center">{peers}</div></div>
+</div></section>
+
+{cta_block('说说您的需求', '业务咨询可电话或邮件联系集团，相关团队将与您进一步沟通。', base='../')}'''
+    return page(path, s['name'] + '｜莞促集团业务板块',
+                s['detail'].rstrip('。') + '。适用场景与交付内容详见本页，业务咨询可联系莞促集团。',
+                s['name'] + ',' + ','.join(s['points'][:2]) + ',莞促集团,' + d['group'],
+                body, 'ServicePage', s['img'], 'services', extra=service,
+                breadcrumb=[('首页', ''), ('业务板块', 'services.html'), (s['name'], path)])
+
+
+# ---------------------------------------------------------------- 企业详情
+# 介绍仅依据公司名称、已公开的集团业务描述与行业通行做法整理，不含资质、案例等未经证实的信息。
+COMPANY_DETAIL = {
+    '莞促集团有限公司': ('headquarters', '集团总部', '总部管理与产业协同',
+                   ['企业总部管理与集团化管控', '产业投资与成员企业协同', '集团品牌与对外合作']),
+    '莞促（广东）连锁企业管理有限公司': ('chain-management', '企业服务', '连锁化企业服务',
+                   ['企业管理服务的连锁化运营', '财税与工商事务对接', '区域服务网络协同']),
+    '莞促企业管理有限公司': ('enterprise-management', '企业服务', '企业管理咨询',
+                   ['企业管理咨询与信息咨询', '组织与流程优化支持', '企业事务对接与协调']),
+    '莞促（海南）企业管理有限公司': ('hainan-management', '区域服务', '海南区域企业管理服务',
+                   ['区域企业管理与咨询', '区域业务对接与协同', '属地化服务支持']),
+    '广东莞促会计师事务所（普通合伙）': ('accounting', '财税服务', '审计与会计服务',
+                   ['审计与会计专业服务', '财务咨询与财税培训', '经营数据核验支持']),
+    '东莞市促顺税务师事务所有限公司': ('tax', '财税服务', '税务师事务所服务',
+                   ['税务事项办理与咨询', '税务筹划与涉税鉴证支持', '税收政策辅导']),
+    '莞促（广东）企业事务代理有限公司': ('agency', '财税服务', '企业事务代理',
+                   ['工商登记与变更事务办理', '企业资质与许可事务对接', '日常企业事务代理']),
+    '爱一键印章刻制有限公司': ('seal', '商事配套', '印章刻制与商事配套',
+                   ['印章刻制与备案事务对接', '企业设立配套服务', '商事证照相关支持']),
+    '莞促（广东）知识产权代理有限公司': ('ip-agency', '知识产权', '商标、专利与版权代理',
+                   ['商标查询、注册与续展', '专利申请与著作权登记', '知识产权保护与项目申报支持']),
+    '东莞市一键网络科技有限公司': ('network-tech', '数字科技', '网络科技与软件开发',
+                   ['软件开发与平台建设', '网络技术服务', '信息系统与数字化支持']),
+    '莞促跨境贸易服务（广东）有限公司': ('cross-border', '数字科技', '跨境贸易综合服务',
+                   ['跨境贸易服务对接', '贸易单证与流程支持', '跨境业务资源整合']),
+    '莞促教育投资有限公司': ('education-invest', '教育文旅', '教育项目投资',
+                   ['教育项目投资与协同', '办学服务资源对接', '教育项目运营管理支持']),
+    '促苗有限公司': ('seed', '教育文旅', '教育与企业服务延伸',
+                   ['教育与培训相关业务协同', '企业服务延伸支持', '成长型项目对接']),
+    '莞促文旅发展（东莞）有限公司': ('tourism', '教育文旅', '文旅项目开发与运营',
+                   ['文旅项目开发与策划', '文旅空间运营管理', '文化与旅游资源整合']),
+    '莞促影视传媒（广东）有限公司': ('media', '教育文旅', '影视与品牌内容服务',
+                   ['影视内容制作与传播', '品牌内容与视觉服务', '企业宣传项目协同']),
+    '莞促新能源（广东）有限公司': ('new-energy', '新能源', '光伏与储能项目投资建设',
+                   ['光伏发电项目投资建设', '储能电站项目协同', '新能源项目运营支持']),
+    '促联新能源（清远）有限公司': ('qingyuan-energy', '新能源', '清远区域新能源项目运营',
+                   ['区域新能源项目运营', '属地化项目对接', '清洁能源业务协同']),
+    '东莞市昂图智能科技有限公司': ('ortur', '投资企业', '桌面级数字创意设备研发制造',
+                   ['激光雕刻机研发制造', '3D打印与CNC设备', '数字创意设备品牌运营']),
+    '四川莞促建筑劳务有限公司': ('sichuan-labor', '工程配套', '建筑劳务与工程配套',
+                   ['建筑劳务服务', '工程配套支持', '区域工程资源协同']),
+}
+
+
+def build_company_detail(cname, cdesc, ctag, group_name, slug, short, scope, points):
+    path = 'company/' + slug + '.html'
+    peers = ''.join(f'<a class="chip" href="{v[0]}.html">{k}</a>'
+                    for k, v in COMPANY_DETAIL.items() if v[0] != slug and k != cname)
+    body = f'''{page_hero('COMPANY / 成员企业', cname, cdesc,
+                  f'<a href="/">首页</a><span>/</span><a href="../companies.html">成员企业</a><span>/</span>{short}')}
+
+<section class="section tight"><div class="container">
+<div class="prose">
+<p>{cname}属于莞促集团「{group_name}」板块，定位为{cdesc}。集团各成员企业按专业分工承接业务，并在客户对接、资源共享与区域协同方面形成联动。</p>
+<p>与其它成员企业一样，{cname}的业务开展遵循集团务实、专业、协同、长期的发展理念：由对应专业团队承接具体事项，服务节点与交付内容明确，客户资料在授权范围内使用。</p>
+</div>
+</div></section>
+
+<section class="section tight"><div class="container">
+{sec_head('SCOPE / 业务方向', '围绕「' + scope + '」开展服务')}
+<div class="grid-2" style="text-align:center">{''.join(f'<div class="card reveal"><span class="num">FIELD {i+1:02d}</span><h3 class="h3">{x}</h3></div>' for i, x in enumerate(points))}</div>
+</div></section>
+
+<section class="section tight"><div class="container">
+{sec_head('GROUP / 板块归属', '集团版图中的<span class="blue">专业分工</span>')}
+<div class="sitemap-box reveal" style="text-align:center"><h3>{group_name}</h3>
+<p>{dict((g[1], g[2]) for g in COMPANY_GROUPS).get(group_name, '')}</p>
+<p class="note">完整名录可在<a href="../companies.html">成员企业</a>栏目查阅。</p></div>
+</div></section>
+
+<section class="section tight"><div class="container">
+<div class="sitemap-box reveal" style="text-align:center"><h3>其他成员与投资企业</h3><div class="tag-list" style="justify-content:center">{peers}</div></div>
+</div></section>
+
+{cta_block('与集团建立连接', '业务合作、产业协同与资源对接，欢迎与我们联系。', base='../')}'''
+    org = {'@type': 'Organization', 'name': cname, 'url': SITE + '/' + path,
+           'parentOrganization': {'@id': SITE + '/#organization'},
+           'description': cdesc}
+    return page(path, cname + '｜莞促集团成员企业',
+                cname + '，' + cdesc + '，隶属莞促集团' + group_name + '板块。了解业务方向与集团版图。',
+                cname + ',' + cdesc + ',莞促集团成员企业,' + group_name,
+                body, 'WebPage', 'biz-arch.jpg', 'companies', extra=org,
+                breadcrumb=[('首页', ''), ('成员企业', 'companies.html'), (short, path)])
+
+
 # ---------------------------------------------------------------- 成员企业
 def build_companies():
     n = 0
@@ -941,8 +1129,8 @@ def build_companies():
         items = []
         for cname, cdesc, ctag in comps:
             n += 1
-            items.append(f'''<div class="company-card reveal"><span class="cnum">{n:02d}</span>
-<div class="cname">{cname}</div><div class="cdesc">{cdesc}</div><span class="ctag">{ctag}</span></div>''')
+            items.append(f'''<a class="company-card reveal" href="company/{COMPANY_DETAIL[cname][0]}.html"><span class="cnum">{n:02d}</span>
+<div class="cname">{cname}</div><div class="cdesc">{cdesc}</div><span class="ctag">{ctag}</span></a>''')
         groups_html.append(f'''<div class="company-group" id="g{i+1}">
 <div class="gh"><span class="gi">{ico}</span><span class="gt">{name}</span><span class="gd">{desc}</span></div>
 <div class="company-list">{''.join(items)}</div></div>''')
@@ -952,7 +1140,7 @@ def build_companies():
 <h3 class="h3">{t}</h3><p>{d}</p></div>''' for i, (t, d) in enumerate(feats))
     itemlist = {'@type': 'ItemList', 'name': '莞促集团成员与投资企业',
                 'itemListElement': [{'@type': 'ListItem', 'position': j + 1, 'name': c[0],
-                                     'description': c[1]} for j, c in enumerate(
+                                     'description': c[1], 'url': SITE + '/company/' + COMPANY_DETAIL[c[0]][0] + '.html'} for j, c in enumerate(
                                          [x for g in COMPANY_GROUPS for x in g[3]])]}
     body = f'''{page_hero('GROUP COMPANIES / 成员企业', '一支分工清晰的企业集群', '集团成员与投资企业按六大板块协同布局，覆盖企业服务、财税、知识产权、数字科技、教育文旅、新能源与工程配套。', '成员企业')}
 
@@ -1100,21 +1288,25 @@ def build_contact():
 </div></section>
 
 <section class="section tight"><div class="container">
-{sec_head('CONSULT / 业务咨询', '把需求告诉我们')}
-<form class="form-box reveal" id="consult-form">
-<div class="form-row">
-<div><label for="c-name">姓名</label><input id="c-name" name="name" type="text" placeholder="请输入姓名" required></div>
-<div><label for="c-company">单位名称</label><input id="c-company" name="company" type="text" placeholder="请输入单位名称"></div>
-<div><label for="c-phone">联系电话</label><input id="c-phone" name="phone" type="tel" placeholder="请输入联系电话" required></div>
-<div><label for="c-topic">关注业务</label><select id="c-topic" name="topic">
-<option value="企业服务与财税工商">企业服务与财税工商</option><option value="知识产权与科技申报">知识产权与科技申报</option>
-<option value="数字科技与大数据">数字科技与大数据</option><option value="产业投资与园区合作">产业投资与园区合作</option>
-<option value="教育与文旅">教育与文旅</option><option value="其他合作">其他合作</option></select></div>
-<div class="full"><label for="c-msg">需求说明</label><textarea id="c-msg" name="message" placeholder="请简要描述您的需求"></textarea></div>
+{sec_head('CONSULT / 业务咨询', '复制联系方式，<span class="blue">直接联系团队</span>')}
+<div class="copy-grid">
+<div class="copy-card reveal"><span class="num">CONTACT 01</span><h3 class="h3">咨询热线</h3>
+<p class="copy-value" id="copy-phone">400-800-4388</p>
+<div class="copy-actions"><a class="btn btn-primary" href="tel:4008004388">一键拨号</a>
+<button class="btn btn-ghost" type="button" data-copy="copy-phone" data-label="400-800-4388">复制号码</button></div></div>
+<div class="copy-card reveal"><span class="num">CONTACT 02</span><h3 class="h3">集团电话</h3>
+<p class="copy-value" id="copy-tel">0769-85034888</p>
+<div class="copy-actions"><a class="btn btn-primary" href="tel:076985034888">一键拨号</a>
+<button class="btn btn-ghost" type="button" data-copy="copy-tel" data-label="0769-85034888">复制号码</button></div></div>
+<div class="copy-card reveal"><span class="num">CONTACT 03</span><h3 class="h3">联系邮箱</h3>
+<p class="copy-value" id="copy-mail">v@guancu.com</p>
+<div class="copy-actions"><a class="btn btn-primary" href="mailto:v@guancu.com">发送邮件</a>
+<button class="btn btn-ghost" type="button" data-copy="copy-mail" data-label="v@guancu.com">复制邮箱</button></div></div>
+<div class="copy-card reveal"><span class="num">CONTACT 04</span><h3 class="h3">集团地址</h3>
+<p class="copy-value copy-address" id="copy-addr">广东省东莞市厚街镇将军路2号悦山花园77号楼102室</p>
+<div class="copy-actions"><button class="btn btn-primary" type="button" data-copy="copy-addr" data-label="广东省东莞市厚街镇将军路2号悦山花园77号楼102室">复制地址</button></div></div>
 </div>
-<button class="btn btn-primary btn-lg" type="submit">提交咨询</button>
-<p class="note" id="form-tip">提交后将唤起邮件客户端，由专人跟进回复。</p>
-</form>
+<p class="note" style="margin-top:18px">点击复制后可粘贴到微信、短信或邮件；服务时间：工作日 09:00–18:00。</p>
 </div></section>
 
 <section class="section tight"><div class="container">
@@ -1293,7 +1485,13 @@ def main():
     paths.append(build_about())
     paths.append(build_tanxi_profile())
     paths.append(build_services())
+    for _slug in SERVICE_BY_SLUG:
+        paths.append(build_service_detail(_slug))
     paths.append(build_companies())
+    for _g in COMPANY_GROUPS:
+        for _c in _g[3]:
+            _d = COMPANY_DETAIL[_c[0]]
+            paths.append(build_company_detail(_c[0], _c[1], _c[2], _g[1], *_d))
     for i in range(1, NEWS_PAGES + 1):
         paths.append(build_news_list(i))
     paths.append(build_contact())

@@ -60,26 +60,29 @@
     items.forEach(function (el) { el.classList.add('in'); });
   }
 
-  // 咨询表单：以邮件方式唤起本地邮件客户端
-  var form = document.getElementById('consult-form');
-  if (form) {
-    form.addEventListener('submit', function (e) {
-      e.preventDefault();
-      var d = new FormData(form);
-      var subject = '官网业务咨询 · ' + (d.get('company') || d.get('name') || '合作意向');
-      var body = [
-        '姓名：' + (d.get('name') || ''),
-        '单位：' + (d.get('company') || ''),
-        '联系电话：' + (d.get('phone') || ''),
-        '关注业务：' + (d.get('topic') || ''),
-        '',
-        '需求说明：',
-        d.get('message') || ''
-      ].join('\n');
-      window.location.href = 'mailto:v@guancu.com?subject=' +
-        encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
-      var tip = document.getElementById('form-tip');
-      if (tip) tip.textContent = '已为您打开邮件客户端，发送后即有专人跟进。';
+  // 联系方式一键复制
+  document.querySelectorAll('[data-copy]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var target = document.getElementById(btn.getAttribute('data-copy'));
+      var text = btn.getAttribute('data-label') || (target ? target.textContent.trim() : '');
+      if (!text) return;
+      function done() {
+        var old = btn.textContent;
+        btn.textContent = '已复制';
+        setTimeout(function () { btn.textContent = old; }, 1800);
+      }
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text).then(done).catch(function () { fallbackCopy(text, done); });
+      } else {
+        fallbackCopy(text, done);
+      }
     });
+  });
+  function fallbackCopy(text, done) {
+    var ta = document.createElement('textarea');
+    ta.value = text; ta.style.position = 'fixed'; ta.style.left = '-9999px';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); done(); } catch (e) {}
+    document.body.removeChild(ta);
   }
 })();
