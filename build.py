@@ -747,7 +747,7 @@ def build_index():
                 'itemListElement': [{'@type': 'ListItem', 'position': i + 1, 'name': s['name'],
                                      'url': SITE + '/services.html#s' + str(int(s['num']))}
                                     for i, s in enumerate(SERVICES)]}
-    return page('index.html', '莞促集团｜东莞企业服务与产业投资集团',
+    return page('index.html', '莞促集团官网｜东莞企业服务与产业投资集团',
                 '莞促集团有限公司立足东莞，业务涵盖企业总部管理、财税与工商服务、知识产权、数字科技、产业投资、教育文旅与新能源，旗下多家成员企业协同服务湾区企业。',
                 '莞促集团,莞促集团有限公司,东莞企业服务,产业投资,财税服务,知识产权,数字科技,集团官网',
                 body, 'WebPage', 'biz-hq.jpg', 'index', extra=itemlist,
