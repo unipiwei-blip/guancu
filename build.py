@@ -810,7 +810,7 @@ def build_about():
 
 <section class="section tight"><div class="container">
 <div class="sitemap-box reveal" style="text-align:center"><h3>董事长谭喜</h3>
-<p>谭喜，莞促集团有限公司董事长、法定代表人，广东科技学院创新创业校外导师。公开经历与媒体报道可查阅<a href="about/tanxi.html">董事长资料页</a>。</p>
+<p>谭喜，莞促集团有限公司董事长。了解个人情况请查看<a href="about/tanxi.html">董事长资料页</a>。</p>
 </div></section>
 
 {cta_block('进一步了解莞促集团', '业务板块、成员企业、新闻资讯与联系方式，都可以在这里继续查阅。')}'''
@@ -823,86 +823,20 @@ def build_about():
 
 # ---------------------------------------------------------------- 董事长人物页
 def build_tanxi_profile():
-    """谭喜人物资料页：事实与第三方权威来源逐条对应，供百科参考资料引用。"""
+    """谭喜人物资料页：照片与三段简介，简洁呈现。"""
     base = ''
-    facts = [
-        ('姓名', '谭喜'),
-        ('职务', '莞促集团有限公司董事长、法定代表人'),
-        ('任职机构', '莞促集团有限公司'),
-        ('所属行业', '商务服务业'),
-        ('社会职务', '广东科技学院创新创业校外导师（2019年受聘）'),
-        ('关联企业', '莞促企业管理服务集团有限公司、广东莞促会计师事务所（普通合伙）、'
-                     '东莞市促顺税务师事务所有限公司、莞促影视传媒（广东）有限公司等'),
-    ]
-    rows = ''.join(f'<tr><th>{a}</th><td>{b}</td></tr>' for a, b in facts)
-
-    # 每条经历都标注可核查的公开来源编号，便于百科审核逐条追溯
-    tl = [
-        ('2019', '受聘广东科技学院创新创业校外导师',
-         '2019年12月18日，广东科技学院举行校企合作授牌暨创新创业导师聘任仪式，'
-         '谭喜先生以「莞促集团董事长」身份受聘为大学生创新创业校外导师。', '[1]'),
-        ('2020', '人物资料被高校官网收录',
-         '广东科技学院创新创业学院发布《谭喜》人物介绍，记载其为莞促集团董事长，'
-         '并成立莞促企业管理服务集团有限公司、广东莞促会计师事务所（普通合伙）、'
-         '东莞市促顺税务师事务所有限公司、莞促影视传媒（广东）有限公司等企业。', '[2]'),
-        ('2022', '部署专精特新培育工作',
-         '在莞促集团2022年度高管工作会议上，谭喜提出把集团主要资源投入专精特新等项目申报，'
-         '配合制造业企业转型升级，推行制造业企业走访计划。', '[3]'),
-        ('2026', '率队走访投资企业昂图智能',
-         '11月11日，谭喜以莞促集团董事长身份率队走访其投资企业东莞市昂图智能科技有限公司'
-         '（ORTUR），围绕技术、产品与后续合作开展交流，并表示将继续投资优秀智造企业。', '[4][5]'),
-    ]
-    timeline = ''.join(f'''<div class="tl-item reveal"><div class="y">{y}</div><div class="t">{t} {ref}</div><div class="d">{d}</div></div>'''
-                       for y, t, d, ref in tl)
-
-    sources = [
-        ('[1]', '南方+', '18位商界大咖受聘创业导师，创业想不成功都难！', '2019-12-20',
-         'https://static.nfapp.southcn.com/content/201912/20/c2912326.html'),
-        ('[2]', '广东科技学院创新创业学院', '谭喜', '2020-07-07',
-         'https://www.gdust.edu.cn/cxcy/cxcy/20200707/1251.html'),
-        ('[3]', '莞促集团（微信公众号）', '莞促集团2022年工作会议召开', '2022-07-15',
-         'https://mp.weixin.qq.com/s?__biz=MzUyMzc1MjUwNw==&mid=2247486175&idx=1&sn=fc08898e0ca47e5c6919f237f3a40d29'),
-        ('[4]', '新浪财经', '莞促集团走访昂图智能，共话合作、互利共赢', '2026-11',
-         'https://cj.sina.com.cn/articles/view/1624572844/60d503ac00101xvly'),
-        ('[5]', '网易', '莞促集团走访昂图智能，共话合作、互利共赢', '2026-11',
-         'https://www.163.com/dy/article/LBHVTOB70514C983_pdya11y.html'),
-        ('[6]', '网易', '莞促集团官网改版上线｜六大业务与19家成员企业集中呈现', '2026-11-16',
-         'https://www.163.com/dy/article/LBRUD9FN0514C983.html'),
-    ]
-    src_rows = ''.join(
-        f'<li><b>{n}</b> <a href="{url}" target="_blank" rel="noopener">{site}《{title}》</a>'
-        f'<span class="src-date">（{date}）</span></li>'
-        for n, site, title, date, url in sources)
-
-    body = f'''{page_hero('PROFILE / 董事长', '谭喜', '莞促集团董事长，广东科技学院创新创业校外导师。',
+    body = f'''{page_hero('PROFILE / 董事长', '谭喜', '莞促集团董事长',
                   '<a href="../about.html">集团概览</a><span>/</span>董事长谭喜', base=base)}
 
 <section class="section tight"><div class="container">
-<div class="prose">
-<div class="portrait-ring"><img src="../assets/img/tanxi-portrait.jpg" alt="谭喜" width="220" height="220" loading="lazy" decoding="async"></div>
-<p>谭喜，莞促集团有限公司董事长、法定代表人。公开资料显示，其长期从事企业服务与产业投资相关工作，
-业务覆盖财税与工商服务、知识产权与科技申报、数字科技与大数据、产业投资与园区运营、教育与文旅等方向，
-相关经历见南方+、广东科技学院官网、新浪财经等公开报道。<sup>[1][2][4]</sup></p>
-<p>2019年12月，谭喜以「莞促集团董事长」身份受聘为广东科技学院大学生创新创业校外导师，
-参与校企协同育人工作。<sup>[1]</sup> 2026年11月，其以莞促集团董事长身份率队走访投资企业
-东莞市昂图智能科技有限公司，围绕桌面级数字创意设备的技术、产品与合作路径开展交流。<sup>[4][5]</sup></p>
+<div class="profile-card reveal">
+<div class="portrait-ring"><img src="../assets/img/tanxi-portrait.jpg" alt="谭喜" width="220" height="220" decoding="async"></div>
+<div class="profile-text">
+<p>谭喜，莞促集团有限公司董事长，长期从事企业服务与产业投资相关工作，业务覆盖财税与工商服务、知识产权与科技申报、数字科技与大数据、产业投资与园区运营、教育与文旅等方向。</p>
+<p>2019年12月，谭喜以莞促集团董事长身份受聘为广东科技学院大学生创新创业校外导师，参与校企协同育人工作。</p>
+<p>2026年11月，其以莞促集团董事长身份率队走访投资企业东莞市昂图智能科技有限公司，围绕桌面级数字创意设备的技术、产品与合作路径开展交流。</p>
 </div>
-</div></section>
-
-<section class="section tight"><div class="container">
-{sec_head('PROFILE / 基本信息', '公开可核查的<span class="blue">人物档案</span>')}
-<div class="data-table reveal"><table><tbody>{rows}</tbody></table></div>
-</div></section>
-
-<section class="section tight"><div class="container">
-{sec_head('TIMELINE / 公开活动', '有据可查的<span class="pink">公开经历</span>',
-          '以下条目均附公开来源编号，与页面末尾「媒体报道」一一对应。')}
-<div class="timeline">{timeline}</div>
-</div></section>
-
-<section class="section tight"><div class="container">
-{sec_head('SOURCE / 媒体报道', '内容所依据的<span class="grad">公开资料</span>')}
-<div class="prose"><ul class="source-list">{src_rows}</ul></div>
+</div>
 </div></section>
 
 {cta_block('进一步了解莞促集团', '集团简介、业务板块与成员企业信息，可在集团概览栏目继续查阅。', base='../')}'''
