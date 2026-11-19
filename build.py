@@ -81,6 +81,7 @@ FRIENDS = [
     ('湾区（广东）数字经济研究院', 'https://www.baydea.com/'),
     ('东莞市常平个体私营企业协会', 'https://www.ichangping.cn/'),
     ('AI建站-跨境极站', 'https://www.gosite.com.cn/'),
+    ('莞促知产', 'https://www.iguancu.cn/'),
     ('莞促集团', 'https://www.guancu.com/'),
 ]
 
