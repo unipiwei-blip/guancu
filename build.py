@@ -763,7 +763,7 @@ def build_index():
 {LANDMARK_SVG}
 <span class="eyebrow">GUANCU GROUP · DONGGUAN</span>
 <h1 class="h1">扎根东莞，<br>与<span class="h2 grad">产业共同成长</span></h1>
-<p class="lead">从企业事务代理起步，莞促集团已形成覆盖企业服务、财税工商、知识产权、数字科技、产业投资与教育文旅的协同格局，以19家成员与投资企业，为湾区企业提供全周期专业支持。</p>
+<p class="lead">从企业事务代理起步，莞促集团已形成覆盖企业服务、财税工商、知识产权、数字科技、产业投资<br>与教育文旅的协同格局，以19家成员与投资企业，为湾区企业提供全周期专业支持。</p>
 <div class="hero-actions"><a class="btn btn-primary btn-lg" href="about.html">了解集团概览</a><a class="btn btn-ghost btn-lg" href="services.html">浏览业务板块</a></div>
 <div class="hero-stats">
 <div class="stat"><b>2017</b><span>集团成立年份</span></div>
