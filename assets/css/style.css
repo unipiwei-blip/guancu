@@ -145,11 +145,11 @@ a.pill:hover{background:var(--blue);color:#fff;border-color:var(--blue);transfor
 .float-tag.f1{left:9%;top:14%;color:var(--blue-deep)}
 .float-tag.f2{color:var(--blue-deep)}
 .float-tag.f3{color:var(--blue-deep)}
-.float-tag.f2{left:9%;top:34%;animation-delay:.9s}
-.float-tag.f3{left:9%;top:54%;animation-delay:1.8s}
+.float-tag.f2{left:9%;top:42%;animation-delay:.9s}
+.float-tag.f3{left:9%;top:64%;animation-delay:1.8s}
 .float-tag.f4{right:9%;top:14%;color:#c31172;animation-delay:1.3s}
-.float-tag.f5{right:9%;top:34%;color:#c31172;animation-delay:2.2s}
-.float-tag.f6{right:9%;top:54%;color:#c31172;animation-delay:3s}
+.float-tag.f5{right:9%;top:42%;color:#c31172;animation-delay:2.2s}
+.float-tag.f6{right:9%;top:64%;color:#c31172;animation-delay:3s}
 @keyframes float{0%,100%{translate:0 0}50%{translate:0 -9px}}
 
 /* 卡片 */
