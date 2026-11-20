@@ -443,3 +443,10 @@ body[data-page="index"] .section{padding:52px 0}
 body[data-page="index"] .section.tight{padding:40px 0}
 body[data-page="index"] .sec-head{margin-bottom:22px}
 body[data-page="index"] .hero .lead{margin-top:18px}
+/* 文章正文：居左、段首空两字符；标题与图注仍居中 */
+.article-prose p{text-align:left;text-indent:2em}
+.article-prose h2,.article-prose h3{text-align:center}
+.article-prose figure,.article-prose figcaption{text-align:center}
+.article-prose ul,.article-prose ol{text-align:left}
+.article-prose li{text-indent:0}
+.article-prose blockquote{text-align:left}

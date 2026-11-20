@@ -1360,7 +1360,7 @@ def build_article(a):
 <div class="article-head"><h1 class="h2">{a['title']}</h1>
 <div class="article-meta"><span>发布日期：{a['date']}</span><span>栏目：<a href="{cat_url}">{a['cat']}</a></span><span>莞促集团</span></div></div>
 <div class="article-cover"><img src="../assets/img/{a['cover']}" alt="{a['title']}" fetchpriority="high" decoding="async"></div>
-<div class="prose">{content}</div>
+<div class="prose article-prose">{content}</div>
 <div class="article-nav"><a class="btn btn-ghost" href="../news.html">返回资讯列表</a><a class="btn btn-ghost" href="{cat_url}">查看{a['cat']}分类</a><a class="btn btn-primary" href="../contact.html">业务咨询</a></div>
 <div class="tag-list" style="margin:30px 0 0"><span class="pill">相关资讯</span>{rel_html}</div>
 </div></section>
