@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 620" width="900" height="620" font-family="'Microsoft YaHei','PingFang SC','Hiragino Sans GB',sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f4f8ff"/>
+      <stop offset="1" stop-color="#eef3ff"/>
+    </linearGradient>
+    <linearGradient id="hd" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#0b47d6"/>
+      <stop offset="1" stop-color="#1a6bff"/>
+    </linearGradient>
+  </defs>
+  <rect width="900" height="620" rx="20" fill="url(#bg)"/>
+  <rect x="0" y="0" width="900" height="72" rx="20" fill="url(#hd)"/>
+  <rect x="0" y="52" width="900" height="20" fill="url(#hd)"/>
+  <text x="450" y="47" text-anchor="middle" fill="#fff" font-size="30" font-weight="700">注册资本实缴期限 · 三个关键日期</text>
+
+  <!-- 三个日期卡片 -->
+  <g>
+    <rect x="36" y="100" width="256" height="120" rx="14" fill="#fff" stroke="#d5e3ff" stroke-width="2"/>
+    <text x="164" y="140" text-anchor="middle" fill="#0b47d6" font-size="26" font-weight="700">2024.7.1</text>
+    <text x="164" y="176" text-anchor="middle" fill="#152f55" font-size="19" font-weight="600">新法施行日</text>
+    <text x="164" y="204" text-anchor="middle" fill="#5a6b85" font-size="15">新老公司的分界线</text>
+  </g>
+  <g>
+    <rect x="322" y="100" width="256" height="120" rx="14" fill="#fff" stroke="#d5e3ff" stroke-width="2"/>
+    <text x="450" y="140" text-anchor="middle" fill="#0b47d6" font-size="26" font-weight="700">2027.6.30</text>
+    <text x="450" y="176" text-anchor="middle" fill="#152f55" font-size="19" font-weight="600">调整截止日</text>
+    <text x="450" y="204" text-anchor="middle" fill="#5a6b85" font-size="15">改章程 · 办备案</text>
+  </g>
+  <g>
+    <rect x="608" y="100" width="256" height="120" rx="14" fill="#fff" stroke="#d5e3ff" stroke-width="2"/>
+    <text x="736" y="140" text-anchor="middle" fill="#0b47d6" font-size="26" font-weight="700">2032.6.30</text>
+    <text x="736" y="176" text-anchor="middle" fill="#152f55" font-size="19" font-weight="600">最晚缴足日</text>
+    <text x="736" y="204" text-anchor="middle" fill="#5a6b85" font-size="15">钱要实缴到位</text>
+  </g>
+
+  <!-- 分界线 -->
+  <line x1="36" y1="252" x2="864" y2="252" stroke="#cfdcf5" stroke-width="2"/>
+
+  <!-- 两类公司 -->
+  <g>
+    <rect x="36" y="274" width="400" height="150" rx="14" fill="#fff" stroke="#d5e3ff" stroke-width="2"/>
+    <rect x="36" y="274" width="400" height="40" rx="14" fill="#e8f0ff"/>
+    <rect x="36" y="298" width="400" height="16" fill="#e8f0ff"/>
+    <text x="56" y="301" fill="#0b47d6" font-size="19" font-weight="700">新公司（2024.7.1 及之后成立）</text>
+    <text x="56" y="344" fill="#152f55" font-size="17">自成立之日起 5 年内缴足</text>
+    <text x="56" y="376" fill="#152f55" font-size="17">章程里的出资期限不得超过 5 年</text>
+    <text x="56" y="406" fill="#5a6b85" font-size="15">设立时即写好，无需等到 2027 年调整</text>
+  </g>
+  <g>
+    <rect x="464" y="274" width="400" height="150" rx="14" fill="#fff" stroke="#d5e3ff" stroke-width="2"/>
+    <rect x="464" y="274" width="400" height="40" rx="14" fill="#fff0f7"/>
+    <rect x="464" y="298" width="400" height="16" fill="#fff0f7"/>
+    <text x="484" y="301" fill="#c31172" font-size="19" font-weight="700">存量公司（2024.6.30 及之前成立）</text>
+    <text x="484" y="344" fill="#152f55" font-size="17">自 2027.7.1 起剩余期限「超过 5 年」→ 须调整</text>
+    <text x="484" y="376" fill="#152f55" font-size="17">剩余期限「不足 5 年」→ 无需调整</text>
+    <text x="484" y="406" fill="#5a6b85" font-size="15">调整后最晚 2032.6.30 前缴足</text>
+  </g>
+
+  <!-- 提醒区 -->
+  <rect x="36" y="448" width="828" height="140" rx="14" fill="#fff" stroke="#ffd9a8" stroke-width="2"/>
+  <text x="60" y="486" fill="#c46a00" font-size="20" font-weight="700">办理三步</text>
+  <text x="60" y="522" fill="#152f55" font-size="17">① 开股东会作出修改章程决议　② 办理章程备案　③ 20 个工作日内在国家企业信用信息公示系统公示</text>
+  <text x="60" y="560" fill="#c31172" font-size="16" font-weight="600">提示：未按期调整会被责令改正；逾期未改将在公示系统被特别标注并向社会公示。</text>
+</svg>
