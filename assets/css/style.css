@@ -150,7 +150,6 @@ a.pill:hover{background:var(--blue);color:#fff;border-color:var(--blue);transfor
 .float-tag.f4{right:9%;top:14%;color:#c31172}
 .float-tag.f5{right:9%;top:42%;color:#c31172}
 .float-tag.f6{right:9%;top:64%;color:#c31172}
-50%{translate:0 -9px}}
 
 /* 卡片 */
 .grid-2,.grid-3,.grid-4{display:grid;gap:20px;text-align:center}
